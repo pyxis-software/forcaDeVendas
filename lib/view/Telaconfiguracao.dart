@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/model/auth.dart';
+import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   final _controllerId = TextEditingController();
   ProgressDialog load;
   String erro;
-  var dir;
+  
 
   @override
   void initState() {
@@ -148,18 +149,24 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
     }
   }
 
-  Future<Auth> getAuth(String host, String id) async {
+  getAuth(String host, String id) async {
     //recebendo os dados da API
-      Map<String, String> headers = {"Content-type": "application/json",  "Accept": "application/json",};
-      String url = 'https://padraotorrent.com/Backend/pages/api/mobile/getTorrents.php';
-      String url2 = 'http://208.115.211.85:5005/api/lotuserpcgi.exe/forcavendas/getususario?idusuario=1';
-      var auth;
+      String url = 'http://$host:5005/api/lotuserpcgi.exe/forcavendas/getususario?idusuario=$id';
       
-      var response = await http.get('$url2');
+      var response = await http.get('$url');
       if(response.statusCode == 200){
-        auth = Auth.fromJson(json.decode(response.body));
-        print(auth.usuarioId);
+        //Recebendo os dados do usuário e armazenando
+        final List data = json.decode(response.body);
+        final usuario = json.encode(data[0]);
+
+        //Armazenando o JSON com as informações do usuário
+        final pref = await SharedPreferences.getInstance();
+        pref.setString('usuario', usuario);
+        
+        print('Tudo foi salvo...');
       }
+      exibeLoad(false, "Salvando...");
+      _showDialog();
   }
 
   void _showDialog() {

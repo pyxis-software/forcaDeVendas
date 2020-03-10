@@ -1,31 +1,26 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/model/cliente.dart';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
+import 'package:forca_de_vendas/controller/repositorio_service_pedido.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:forca_de_vendas/controller/functions.dart';
+import 'package:forca_de_vendas/model/pedido.dart';
 import 'package:forca_de_vendas/view/TelaLogin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'TelaLogin.dart';
 
 class TelaInicial extends StatefulWidget {
   @override
-  
-  
   _TelaInicialState createState() => _TelaInicialState();
 }
 
 class _TelaInicialState extends State<TelaInicial> {
-  List<Cliente> clientes;
+  Future<List<Pedido>> pedidos;
   var load;
-  var box = Hive.openBox("clientes");
   
   @override
   void initState() {
     // TODO: implement initState
     load = true;
-    //_getClientes();
+    _getClientes();
   }
 
 
@@ -67,7 +62,7 @@ class _TelaInicialState extends State<TelaInicial> {
               ),
               Divider(height: 20.0,),
               Expanded(
-                child: _getListClientes(),
+                child: _getListPedidos(),
               ),
               ],
             ),
@@ -118,38 +113,27 @@ class _TelaInicialState extends State<TelaInicial> {
 
   //getClientes
   _getClientes() async {
-    var response = await http.get("https://jrnet.pyxissoftware.com.br/api/teste");
-    if(response.statusCode == 200){
-      var data = json.decode(response.body);
-      print(data);
-      var rest = data["clientes"] as List;
-      setState(() {
-        clientes = rest.map<Cliente>((json)=> Cliente.fromJson(json)).toList();
-        
-      });
-      
-    }else{
-      print("Erro");
-    }
+    pedidos = RepositoryServicePedido.getAllPedidos();
   }
 
   //Lista os clientes
-  _getListClientes(){
-    if(clientes == null){
-      return Container(
-        child: Text("Sem Clientes!"),
-      );
-    }else if(clientes.length != 0){
-      return ListView.builder(
-        itemCount: clientes.length,
-        itemBuilder: (context, index){
-          return _criaLista(index);
-        });
-    }
+  _getListPedidos(){
+    return FutureBuilder(
+      future: pedidos,
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return _criaLista(snapshot);
+        }else{
+          return Container(
+            child: Text("Sem Pedidos!"),
+          );
+        }
+      },
+    );
   }
 
   //Cria a visualização
- Widget _criaLista(index){
+ Widget _criaLista(pedido){
     return Card(
       elevation: 10.0,
       child: Padding(
@@ -167,11 +151,11 @@ class _TelaInicialState extends State<TelaInicial> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${clientes[index].codigo}", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+                        child: Text("${pedido.codigo}", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${clientes[index].cidade}", style: TextStyle(fontSize: 20.0),),
+                        child: Text("${pedido.cidade}", style: TextStyle(fontSize: 20.0),),
                       )
                     ],
                   ),
@@ -183,7 +167,7 @@ class _TelaInicialState extends State<TelaInicial> {
                     children: <Widget>[
                       Flexible(
                         child: Text(
-                        "${clientes[index].nome}",
+                        "${pedido.nome}",
                         style: TextStyle(fontSize: 20.0,),
                         overflow: TextOverflow.ellipsis,
                         ),
@@ -198,11 +182,11 @@ class _TelaInicialState extends State<TelaInicial> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${clientes[index].data}", style: TextStyle(fontSize: 20.0),),
+                        child: Text("${pedido.data}", style: TextStyle(fontSize: 20.0),),
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("R\$ ${clientes[index].valor}", style: TextStyle(fontSize: 20.0, color: Colors.red,),),
+                        child: Text("R\$ ${pedido.valor}", style: TextStyle(fontSize: 20.0, color: Colors.red,),),
                       ),
                     ],
                   ),
@@ -253,5 +237,5 @@ class _TelaInicialState extends State<TelaInicial> {
         )
       ),
     );
- }
+  }
 }

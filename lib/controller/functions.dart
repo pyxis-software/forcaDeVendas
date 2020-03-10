@@ -1,9 +1,17 @@
 
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/TelaInicial.dart';
+import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:forca_de_vendas/view/clientes.dart';
 import 'package:forca_de_vendas/view/financeiro.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+var db;
 
 getDataUsuario(String id, String host) async {
   //buscando os dados da API
@@ -92,4 +100,21 @@ getDrawer(context){
       ],
     ),
   );
+}
+
+//Retorna os dados do usuário
+Future<Usuario> getUsuario(context) async{
+  final pref = await SharedPreferences.getInstance();
+  final data = pref.getString('usuario');
+  if(data != null){
+    Usuario user = Usuario.fromJson(data);
+    return user;
+  }else{
+    return Navigator.push(context, MaterialPageRoute(builder: (context) => TelaConfiguracao()),);;
+  }
+}
+
+//Converte String em MD5
+String textToMd5 (String text) {
+  return md5.convert(utf8.encode(text)).toString().toUpperCase();
 }

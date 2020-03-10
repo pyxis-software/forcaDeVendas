@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:forca_de_vendas/controller/functions.dart';
+import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/TelaInicial.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -28,8 +30,6 @@ class _TelaLoginState extends State<TelaLogin> {
       isDismissible: false,
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -123,19 +123,55 @@ class _TelaLoginState extends State<TelaLogin> {
   actionLogin() async{
     String user = _controllerUser.text;
     String pass = _controllerPassword.text;
-    print(user);
-    if(user == null || pass == null){
-      print("Sem dados");
+    Usuario usuario;
+    if(user.isEmpty || pass.isEmpty){
+      _showDialog("Campos sem informações!");
     }else{
-      //verifica se o  usuário quer salvar seu login
-      if(salvaAuth){
-        //entra sanlvando o login
+      final pref = await SharedPreferences.getInstance();
+      final data = pref.getString('usuario');
+      if(data != null){
+        usuario = Usuario.fromJson(data);
       }else{
-        //Entra sem salvar o login
-        final pref = await SharedPreferences.getInstance();
-        pref.setBool('auth', true);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => TelaInicial()),);
+        return Navigator.push(context, MaterialPageRoute(builder: (context) => TelaConfiguracao()),);
+      }
+      String senhaConvert = textToMd5(pass);
+      print(senhaConvert);
+      if(user == usuario.usuarioNome && senhaConvert == usuario.usuarioSenha){
+        //verifica se o  usuário quer salvar seu login
+        if(salvaAuth){
+          //entra salvando o login
+        }else{
+          //Entra sem salvar o login
+          final pref = await SharedPreferences.getInstance();
+          pref.setBool('auth', true);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaInicial()));
+        }
+      }else{
+        _showDialog("Nome de usuário ou senha incorreta");
       }
     }
+  }
+
+  void _showDialog(String mensagem) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: new Text(mensagem,
+          style: TextStyle(fontSize: 25, color: Colors.green)),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
