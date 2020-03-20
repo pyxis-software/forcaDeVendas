@@ -25,6 +25,9 @@ dependencies:
   sqflite: ^1.2.2
   path_provider: ^1.1.0
   crypto: ^2.0.6
+  intl: ^0.15.8
+  datetime_picker_formfield: ^1.0.0
+  dio: ^3.0.9
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -51,6 +54,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
    - lib/assets/splash.jpg
+   - lib/assets/logo.png
+   - lib/assets/alerta.png
+   - lib/assets/certo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

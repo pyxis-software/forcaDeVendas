@@ -28,7 +28,7 @@ class _TelaInicialState extends State<TelaInicial> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("SalesForce"),
+        title: Text("Força de Vendas"),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.exit_to_app),
@@ -53,10 +53,18 @@ class _TelaInicialState extends State<TelaInicial> {
                     onPressed: () => {
                       //
                     },
-                    child: Text(
-                      "Alguma Coisa Aqui",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
+                    child: Center(
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.shopping_cart),
+                          Text(
+                            "Novo Pedido",
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
                   color: Color.fromARGB(100, 255, 183, 50),
                 ),
               ),
@@ -77,7 +85,7 @@ class _TelaInicialState extends State<TelaInicial> {
   _logOut() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool('auth',false);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaLogin()));
+    Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
   }
 
   //Confirmação de Log out

@@ -8,6 +8,8 @@ import 'package:forca_de_vendas/view/TelaInicial.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:forca_de_vendas/view/clientes.dart';
 import 'package:forca_de_vendas/view/financeiro.dart';
+import 'package:forca_de_vendas/view/produtos.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,25 +26,12 @@ getDataUsuario(String id, String host) async {
     print("Erro");
   }
 }
-
-
 //Retorna o Drawer
-getDrawer(context){
+getDrawer(context) {
   return Drawer(
     child: ListView(
       padding: EdgeInsets.zero,
       children: <Widget>[
-        UserAccountsDrawerHeader(
-          accountName: Text("Macoratti"),
-          accountEmail: Text("macoratti@yahoo.com"),
-          currentAccountPicture: CircleAvatar(
-            radius: 30.0,
-            backgroundImage: 
-          NetworkImage(
-'https://img.icons8.com/plasticine/2x/user.png'),
-            backgroundColor: Colors.transparent,
-          ),
-        ),
         ListTile(
           selected: true,
           leading: Icon(Icons.supervised_user_circle),
@@ -50,6 +39,7 @@ getDrawer(context){
           subtitle: Text("Meus Clientes..."),
           trailing: Icon(Icons.arrow_forward),
           onTap: () {
+            Navigator.pop(context);
             Navigator.push(context, MaterialPageRoute(builder: (context) => Clientes()),);
           }
         ),
@@ -60,6 +50,7 @@ getDrawer(context){
           trailing: Icon(Icons.arrow_forward),
           onTap: () {
             Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaProdutos()),);
           }
         ),
         ListTile(
@@ -82,11 +73,12 @@ getDrawer(context){
         ),
         ListTile(
           leading: Icon(Icons.sync),
-          title: Text("Sinccronizar Dados"),
+          title: Text("Sincronizar Dados"),
           subtitle: Text("Enviar para o servidor..."),
           trailing: Icon(Icons.arrow_forward),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaInicial()),);
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SincronizarDados()),);
           }
         ),
         ListTile(
@@ -100,18 +92,6 @@ getDrawer(context){
       ],
     ),
   );
-}
-
-//Retorna os dados do usuário
-Future<Usuario> getUsuario(context) async{
-  final pref = await SharedPreferences.getInstance();
-  final data = pref.getString('usuario');
-  if(data != null){
-    Usuario user = Usuario.fromJson(data);
-    return user;
-  }else{
-    return Navigator.push(context, MaterialPageRoute(builder: (context) => TelaConfiguracao()),);;
-  }
 }
 
 //Converte String em MD5

@@ -84,4 +84,16 @@ class Cliente {
         "telefone": telefone,
         "celular": celular,
     };
+    Map<String, dynamic> toMap() => {
+        "codigo": codigo,
+        "cpf": cpf,
+        "nome": nome,
+        "endereco": endereco,
+        "bairro": bairro,
+        "cidade": cidade,
+        "estado": estado,
+        "cep": cep,
+        "telefone": telefone,
+        "celular": celular,
+    };
 }

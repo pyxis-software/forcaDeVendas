@@ -36,7 +36,7 @@ class _TelaLoginState extends State<TelaLogin> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        title: const Text('SalesForce'),
+        title: const Text('Força de Vendas'),
           actions: <Widget>[
             // action button
             IconButton(
@@ -47,76 +47,78 @@ class _TelaLoginState extends State<TelaLogin> {
             ),
           ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 180,
-                  height: 180,
-                  child: Image.asset("lib/assets/splash.jpg"),
-                ),
-                TextFormField(
-                  autocorrect: true,
-                  controller: _controllerUser,
-                  keyboardType: TextInputType.text,
-                  style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
-                  decoration: InputDecoration(
-                    labelText: "Usuário",
-                    labelStyle: TextStyle(color: Colors.blueAccent)
-                  ),
-                ),
-                Divider(),
-                TextFormField(
-                  obscureText: true,
-                  controller: _controllerPassword,
-                  keyboardType: TextInputType.text,
-                  style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
-                  decoration: InputDecoration(
-                    labelText: "Senha",
-                    labelStyle: TextStyle(color: Colors.blueAccent)
-                  ),
-                ),
-                Divider(height: 30.0),
-                ButtonTheme(
-                  height: 60.0,
-                  child: RaisedButton(
-                    onPressed: () => actionLogin(),
-                    child: Text(
-                      "Fazer Login",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  color: Color.fromARGB(100, 255, 183, 50),
-                ),
-              ),
-              Divider(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+      body: Container(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Checkbox(
-                    value: salvaAuth,
-                    onChanged: (value){
-                      setState(() {
-                        salvaAuth = value;
-                      });
-                    }
+                  Container(
+                    width: 180,
+                    height: 180,
+                    child: Image.asset("lib/assets/logo.png"),
                   ),
-                  Text(
-                    "Lembrar-me",
-                    style: TextStyle(fontSize: 18.0),
+                  TextFormField(
+                    autocorrect: true,
+                    controller: _controllerUser,
+                    keyboardType: TextInputType.text,
+                    style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                    decoration: InputDecoration(
+                      labelText: "Usuário",
+                      labelStyle: TextStyle(color: Colors.blueAccent)
+                    ),
                   ),
-                ],
-              )
-              
-            ],
+                  Divider(),
+                  TextFormField(
+                    obscureText: true,
+                    controller: _controllerPassword,
+                    keyboardType: TextInputType.text,
+                    style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                    decoration: InputDecoration(
+                      labelText: "Senha",
+                      labelStyle: TextStyle(color: Colors.blueAccent)
+                    ),
+                  ),
+                  Divider(height: 30.0),
+                  ButtonTheme(
+                    height: 60.0,
+                    child: RaisedButton(
+                      onPressed: () => actionLogin(),
+                      child: Text(
+                        "Fazer Login",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    color: Color.fromARGB(100, 255, 183, 50),
+                  ),
+                ),
+                Divider(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Checkbox(
+                      value: salvaAuth,
+                      onChanged: (value){
+                        setState(() {
+                          salvaAuth = value;
+                        });
+                      }
+                    ),
+                    Text(
+                      "Lembrar-me",
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                  ],
+                )
+                
+              ],
+            ),
           ),
         ),
-      ),
     ),
+      ),
   );
 }
 
@@ -125,7 +127,7 @@ class _TelaLoginState extends State<TelaLogin> {
     String pass = _controllerPassword.text;
     Usuario usuario;
     if(user.isEmpty || pass.isEmpty){
-      _showDialog("Campos sem informações!");
+      _errorDadosInput("Campos em Branco!");
     }else{
       final pref = await SharedPreferences.getInstance();
       final data = pref.getString('usuario');
@@ -140,31 +142,42 @@ class _TelaLoginState extends State<TelaLogin> {
         //verifica se o  usuário quer salvar seu login
         if(salvaAuth){
           //entra salvando o login
-        }else{
-          //Entra sem salvar o login
           final pref = await SharedPreferences.getInstance();
           pref.setBool('auth', true);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaInicial()));
+        }else{
+          //Entra sem salvar o login
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaInicial()));
         }
       }else{
-        _showDialog("Nome de usuário ou senha incorreta");
+        _errorDadosInput("Nome de usuário ou senha incorreta");
       }
     }
   }
 
-  void _showDialog(String mensagem) {
-    // flutter defined function
+  _errorDadosInput(String mensagem){
     showDialog(
+      barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          content: new Text(mensagem,
-          style: TextStyle(fontSize: 25, color: Colors.green)),
+          content: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
+                Divider( height: 20.0, color: Colors.transparent,),
+                Container(
+                  child: Text(mensagem, style: TextStyle(fontSize: 25.0),)
+                  ),
+              ],
+            )
+          ),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Ok"),
+              child: new Text("OK"),
               onPressed: () {
                 Navigator.pop(context);
               },

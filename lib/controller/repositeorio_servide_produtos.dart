@@ -1,56 +1,56 @@
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
+import 'package:forca_de_vendas/model/produto.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-class RepositoryServiceCliente{
+class RepositoryServiceProdutos{
   static DatabaseCreator database = DatabaseCreator();
 
-  static Future<List<Cliente>> getAllClientes() async{
+  static Future<List<Produto>> getAllProdutos() async{
 
     Database db = await database.database;
-    List<Cliente> clientes = List();
+    List<Produto> produtos = List();
 
-    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes}''';
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaProdutos}''';
     final data = await db.rawQuery(sql);
     for(final node in data){
-      final cliente = Cliente.fromJson(node);
-      clientes.add(cliente);
+      final produto = Produto.fromJson(node);
+      produtos.add(produto);
     }
-    return clientes;
+    return produtos;
   }
 
-  static Future<Cliente> getCliente(int id) async{
+  static Future<int> getProduto(int codigo) async{
     Database db = await database.database;
-    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes}
-    WHERE ${DatabaseCreator.id} == $id''';
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaProdutos}
+    WHERE ${DatabaseCreator.produtoIdProduto} == $codigo''';
     final data = await db.rawQuery(sql);
-
-    final pedido = Cliente.fromJson(data[0]);
-    return pedido;
+    int count = data[0].values.elementAt(0);
+    return count;
   }
 
-  static Future <List<Cliente>> buscaCliente(String busca) async {
+  static Future <List<Produto>> buscaProdutos(String busca) async {
     Database db = await database.database;
-    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes} 
-    WHERE ${DatabaseCreator.clienteNome} LIKE "%$busca%" OR
-    ${DatabaseCreator.clienteCodigo} LIKE "%$busca%" OR
-    ${DatabaseCreator.clienteCPF} LIKE "%$busca%"''';
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaProdutos} 
+    WHERE ${DatabaseCreator.produtoIdProduto} LIKE "%$busca%" OR
+    ${DatabaseCreator.produtoDescricao} LIKE "%$busca%" OR
+    ${DatabaseCreator.produtoRefFabrica} LIKE "%$busca%"''';
     final data = await db.rawQuery(sql);
-    List<Cliente> clientes = List();
+    List<Produto> produtos = List();
 
     for(final node in data){
-      final cliente = Cliente.fromJson(node);
-      clientes.add(cliente);
+      final produto = Produto.fromJson(node);
+      produtos.add(produto);
     }
-    return clientes;
+    return produtos;
   }
 
-  static Future<int> addCliente(Cliente c) async {
+  static Future<int> addProduto(Produto p) async {
     Database db = await database.database;
-    
-    final result = await db.insert(DatabaseCreator.tabelaClientes, c.toMap());
-    return result;
+
+    var res = await db.insert(DatabaseCreator.tabelaProdutos, p.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
+    return res;
   }
 
   static Future<void> deletePedido(Cliente c) async{
@@ -62,7 +62,7 @@ class RepositoryServiceCliente{
 
   static Future<void> updatePedido(Cliente c) async{
     Database db = await database.database;
-    final sql = '''UPDATE ${DatabaseCreator.tabelaClientes} SET 
+    final sql = '''UPDATE ${DatabaseCreator.tabelaClientes} SET 1
     ${DatabaseCreator.clienteCPF} = "${c.cep}",
     ${DatabaseCreator.clienteNome} = "${c.nome}",
     ${DatabaseCreator.clienteEndereco} = "${c.endereco}",

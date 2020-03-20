@@ -71,7 +71,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
                   keyboardType: TextInputType.number,
                   style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
                   decoration: InputDecoration(
-                    labelText: "Id",
+                    labelText: "Id Colaborador",
                     labelStyle: TextStyle(color: Colors.blueAccent)
                   ),
                 ),
@@ -86,11 +86,6 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
                     ),
                     color: Color.fromARGB(100, 255, 183, 50),
                   ),
-                ),
-                Divider(height: 30),
-                Text(
-                  erro,
-                  style: TextStyle(fontSize: 20.0, color: Colors.red, fontWeight: FontWeight.bold)
                 ),
               ],
             ),
@@ -131,15 +126,12 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   }
 
   actionSalvar() async {
-    exibeLoad(true, "Salvando...");
+    _exibeLoading();
     String campo = _controllerHost.text;
     String id = _controllerId.text;
-    print(campo);
-    if(campo == null || id == null){
-      setState(() {
-        erro = "Campos em Branco";
-      });
-      
+    if(campo.isEmpty || id.isEmpty){
+      Navigator.pop(context);
+      _errorDadosInput("Campos em Branco!");
     }else{
       final pref = await SharedPreferences.getInstance();
       pref.setString('host', campo);
@@ -152,38 +144,141 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   getAuth(String host, String id) async {
     //recebendo os dados da API
       String url = 'http://$host:5005/api/lotuserpcgi.exe/forcavendas/getususario?idusuario=$id';
-      
-      var response = await http.get('$url');
-      if(response.statusCode == 200){
-        //Recebendo os dados do usuário e armazenando
-        final List data = json.decode(response.body);
-        final usuario = json.encode(data[0]);
+      try{
+        var response = await http.get('$url');
+        if(response.statusCode == 200){
+          //Recebendo os dados do usuário e armazenando
+          final List data = json.decode(response.body);
+          final usuario = json.encode(data[0]);
 
-        //Armazenando o JSON com as informações do usuário
-        final pref = await SharedPreferences.getInstance();
-        pref.setString('usuario', usuario);
-        
-        print('Tudo foi salvo...');
+          //Armazenando o JSON com as informações do usuário
+          final pref = await SharedPreferences.getInstance();
+          pref.setString('usuario', usuario);
+          //Exibe alerta de tudo certo
+          Navigator.pop(context);
+          _exibeSuccess();
+        }else{
+          Navigator.pop(context);
+          _errorAlert("1");
+        }
+      }catch(e){
+        Navigator.pop(context);
+        _errorAlert("1");
       }
-      exibeLoad(false, "Salvando...");
-      _showDialog();
   }
 
-  void _showDialog() {
-    // flutter defined function
+  //Loading alert
+  _exibeLoading(){
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          content: new Text("Configurações Salvas Com Sucesso!",
-          style: TextStyle(fontSize: 25, color: Colors.green)),
+          content: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Row(
+              children: <Widget>[
+                CircularProgressIndicator(
+                ),
+                Text("  "),
+                Text("Verificando...", style: TextStyle(fontSize: 25.0),),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  //Exibe sincronização concluída
+  _exibeSuccess(){
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.asset('lib/assets/certo.png', width: 50, height: 50,),
+                Divider( height: 20.0, color: Colors.transparent,),
+                Text("Configurações Salvas!", style: TextStyle(fontSize: 25.0),),
+              ],
+            )
+          ),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Ok"),
+              child: new Text("Finalizar"),
               onPressed: () {
                 Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //Erro Sincronização
+  _errorAlert(String codigo){
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
+                Divider( height: 20.0, color: Colors.transparent,),
+                Text("Erro ao salvar!", style: TextStyle(fontSize: 25.0),),
+                Text("Verifique sua internet!", style: TextStyle(fontSize: 25.0),),
+              ],
+            )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //Erro nos dados informados
+  _errorDadosInput(String mensagem){
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
+                Divider( height: 20.0, color: Colors.transparent,),
+                Text(mensagem, style: TextStyle(fontSize: 25.0),),
+              ],
+            )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
                 Navigator.pop(context);
               },
             ),

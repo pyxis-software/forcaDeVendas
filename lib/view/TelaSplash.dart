@@ -47,9 +47,9 @@ class _TelaSplashState extends State<TelaSplash> {
       color: Colors.blueAccent,
       child: Center(
         child: Container(
-          width: 150,
-          height: 150,
-          child: Image.asset("lib/assets/splash.jpg"),
+          width: 300,
+          height: 300,
+          child: Image.asset("lib/assets/logo.png",),
         ),
       ),
     );

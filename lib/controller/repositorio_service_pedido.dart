@@ -1,5 +1,8 @@
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/model/pedido.dart';
+import 'package:sqflite/sqflite.dart';
+
+Database db;
 
 class RepositoryServicePedido{
   static Future <List<Pedido>> getAllPedidos() async{
@@ -12,6 +15,8 @@ class RepositoryServicePedido{
       final pedido = Pedido.fromJson(node);
       pedidos.add(pedido);
     }
+    db.close();
+    db = null;
     return pedidos;
   }
 
@@ -42,14 +47,12 @@ class RepositoryServicePedido{
     )
     ''';
     final result = await db.rawInsert(sql);
-    DatabaseCreator.databaseLog("Pedido Adicionado", sql, null, result);
   }
 
   static Future<void> deletePedido(Pedido p) async{
     final sql = '''DELETE FROM ${DatabaseCreator.tabelaPedidos}
     WHERE ${DatabaseCreator.codigo} == ${p.codigo}''';
     final result = await db.rawDelete(sql);
-    DatabaseCreator.databaseLog("Pedido deletado", sql, null, result);
   }
 
   static Future<void> updatePedido(Pedido p) async{
@@ -63,7 +66,6 @@ class RepositoryServicePedido{
     ''';
 
     final result = await db.rawUpdate(sql);
-    DatabaseCreator.databaseLog("Pedido Atualizado", sql, null, result);
   }
 
   static Future<int> contPedidos() async{
