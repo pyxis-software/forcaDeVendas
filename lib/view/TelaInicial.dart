@@ -28,6 +28,7 @@ class _TelaInicialState extends State<TelaInicial> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF3C5A99),
         title: Text("Força de Vendas"),
         actions: <Widget>[
           IconButton(
@@ -47,27 +48,35 @@ class _TelaInicialState extends State<TelaInicial> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                ButtonTheme(
-                  height: 60.0,
-                  child: RaisedButton(
-                    onPressed: () => {
-                      //
-                    },
-                    child: Center(
+                Container(
+                  height: 60,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF3C5A99),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(5),
+                    ),
+                  ),
+                  child: SizedBox.expand(
+                    child: FlatButton(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Icon(Icons.shopping_cart),
                           Text(
                             "Novo Pedido",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
+                            textAlign: TextAlign.left,
                           ),
                         ],
                       ),
+                      onPressed: () {},
                     ),
-                    
-                  color: Color.fromARGB(100, 255, 183, 50),
+                  ),
                 ),
-              ),
               Divider(height: 20.0,),
               Expanded(
                 child: _getListPedidos(),

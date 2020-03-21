@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,10 @@ class TelaConfiguracao extends StatefulWidget {
 }
 
 class _TelaConfiguracaoState extends State<TelaConfiguracao> {
-  
-  final _controllerHost =  TextEditingController();
+  final _controllerHost = TextEditingController();
   final _controllerId = TextEditingController();
   ProgressDialog load;
   String erro;
-  
 
   @override
   void initState() {
@@ -36,80 +35,103 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: true,
-      appBar: AppBar(
-        backgroundColor: Colors.blueAccent,
-        title: const Text('Configuração'),
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextFormField(
-                  autofocus: true,
-                  autocorrect: true,
-                  showCursor: true,
-                  controller: _controllerHost,
-                  keyboardType: TextInputType.text,
-                  style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
-                  decoration: InputDecoration(
-                    labelText: "Host",
-                    labelStyle: TextStyle(color: Colors.blueAccent)
+        resizeToAvoidBottomPadding: true,
+        appBar: AppBar(
+          backgroundColor: Color(0xFF3C5A99),
+          title: const Text('Configuração'),
+        ),
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextFormField(
+                    autofocus: true,
+                    autocorrect: true,
+                    showCursor: true,
+                    controller: _controllerHost,
+                    keyboardType: TextInputType.text,
+                    style:
+                        new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                    decoration: InputDecoration(
+                        labelText: "Host",
+                        labelStyle: TextStyle(color: Colors.blueAccent)),
                   ),
-                ),
-                Divider( height: 20),
-                TextFormField(
-                  autofocus: true,
-                  autocorrect: true,
-                  showCursor: true,
-                  controller: _controllerId,
-                  keyboardType: TextInputType.number,
-                  style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
-                  decoration: InputDecoration(
-                    labelText: "Id Colaborador",
-                    labelStyle: TextStyle(color: Colors.blueAccent)
+                  Divider(
+                    height: 20,
+                    color: Colors.transparent,
                   ),
-                ),
-                Divider(height: 20),
-                ButtonTheme(
-                  height: 60.0,
-                  child: RaisedButton(
-                    onPressed: () => actionSalvar(),
-                    child: Text(
-                      "Salvar",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
+                  TextFormField(
+                    autofocus: true,
+                    autocorrect: true,
+                    showCursor: true,
+                    controller: _controllerId,
+                    keyboardType: TextInputType.number,
+                    style:
+                        new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                    decoration: InputDecoration(
+                        labelText: "Id Colaborador",
+                        labelStyle: TextStyle(color: Colors.blueAccent)),
+                  ),
+                  Divider(height: 20),
+                  Container(
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF3C5A99),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(5),
+                      ),
                     ),
-                    color: Color.fromARGB(100, 255, 183, 50),
+                    child: SizedBox.expand(
+                      child: FlatButton(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Salvar",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          actionSalvar();
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      )
-    );
+        ));
   }
 
   //Busca o host salvo
-  void buscaHost() async{
+  void buscaHost() async {
     final pref = await SharedPreferences.getInstance();
     String h = pref.getString('host');
     String id = pref.getString('id_vend');
     print(h);
-    if(h != null && id != null){
+    if (h != null && id != null) {
       setState(() {
         _controllerHost.text = h;
         _controllerId.text = id;
       });
     }
   }
-  exibeLoad(bool ativo, String message){
-    if(ativo){
+
+  exibeLoad(bool ativo, String message) {
+    if (ativo) {
       load.style(
         message: message,
         progressWidget: CircularProgressIndicator(),
@@ -117,7 +139,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
         insetAnimCurve: Curves.easeInOut,
       );
       load.show();
-    }else{
+    } else {
       setState(() {
         load.hide();
         load.update();
@@ -129,10 +151,10 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
     _exibeLoading();
     String campo = _controllerHost.text;
     String id = _controllerId.text;
-    if(campo.isEmpty || id.isEmpty){
+    if (campo.isEmpty || id.isEmpty) {
       Navigator.pop(context);
       _errorDadosInput("Campos em Branco!");
-    }else{
+    } else {
       final pref = await SharedPreferences.getInstance();
       pref.setString('host', campo);
       pref.setString('id_vend', id);
@@ -143,32 +165,37 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
 
   getAuth(String host, String id) async {
     //recebendo os dados da API
-      String url = 'http://$host:5005/api/lotuserpcgi.exe/forcavendas/getususario?idusuario=$id';
-      try{
-        var response = await http.get('$url');
-        if(response.statusCode == 200){
-          //Recebendo os dados do usuário e armazenando
-          final List data = json.decode(response.body);
-          final usuario = json.encode(data[0]);
+    var auth = 'Basic ' + base64Encode(utf8.encode('admin:admin'));
+    String url = 'http://$host:5005/forcavendas/getususario?idusuario=$id';
+    try {
+      var response = await http.get(
+        '$url',
+        headers: {HttpHeaders.authorizationHeader: "Basic YWRtaW46YWRtaW4="},
+      );
+      print(response.statusCode.toString());
+      if (response.statusCode == 200) {
+        //Recebendo os dados do usuário e armazenando
+        final List data = json.decode(response.body);
+        final usuario = json.encode(data[0]);
 
-          //Armazenando o JSON com as informações do usuário
-          final pref = await SharedPreferences.getInstance();
-          pref.setString('usuario', usuario);
-          //Exibe alerta de tudo certo
-          Navigator.pop(context);
-          _exibeSuccess();
-        }else{
-          Navigator.pop(context);
-          _errorAlert("1");
-        }
-      }catch(e){
+        //Armazenando o JSON com as informações do usuário
+        final pref = await SharedPreferences.getInstance();
+        pref.setString('usuario', usuario);
+        //Exibe alerta de tudo certo
+        Navigator.pop(context);
+        _exibeSuccess();
+      } else {
         Navigator.pop(context);
         _errorAlert("1");
       }
+    } catch (e) {
+      Navigator.pop(context);
+      _errorAlert("1");
+    }
   }
 
   //Loading alert
-  _exibeLoading(){
+  _exibeLoading() {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -181,10 +208,12 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
             ),
             child: Row(
               children: <Widget>[
-                CircularProgressIndicator(
-                ),
+                CircularProgressIndicator(),
                 Text("  "),
-                Text("Verificando...", style: TextStyle(fontSize: 25.0),),
+                Text(
+                  "Verificando...",
+                  style: TextStyle(fontSize: 25.0),
+                ),
               ],
             ),
           ),
@@ -194,7 +223,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   }
 
   //Exibe sincronização concluída
-  _exibeSuccess(){
+  _exibeSuccess() {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -202,15 +231,24 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
         // return object of type Dialog
         return AlertDialog(
           content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Image.asset('lib/assets/certo.png', width: 50, height: 50,),
-                Divider( height: 20.0, color: Colors.transparent,),
-                Text("Configurações Salvas!", style: TextStyle(fontSize: 25.0),),
-              ],
-            )
-          ),
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Image.asset(
+                'lib/assets/certo.png',
+                width: 50,
+                height: 50,
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Configurações Salvas!",
+                style: TextStyle(fontSize: 25.0),
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Finalizar"),
@@ -226,7 +264,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   }
 
   //Erro Sincronização
-  _errorAlert(String codigo){
+  _errorAlert(String codigo) {
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -234,16 +272,28 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
         // return object of type Dialog
         return AlertDialog(
           content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
-                Divider( height: 20.0, color: Colors.transparent,),
-                Text("Erro ao salvar!", style: TextStyle(fontSize: 25.0),),
-                Text("Verifique sua internet!", style: TextStyle(fontSize: 25.0),),
-              ],
-            )
-          ),
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Image.asset(
+                'lib/assets/alerta.png',
+                width: 50,
+                height: 50,
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Erro ao salvar!",
+                style: TextStyle(fontSize: 25.0),
+              ),
+              Text(
+                "Verifique sua internet!",
+                style: TextStyle(fontSize: 25.0),
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),
@@ -258,7 +308,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   }
 
   //Erro nos dados informados
-  _errorDadosInput(String mensagem){
+  _errorDadosInput(String mensagem) {
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -266,15 +316,24 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
         // return object of type Dialog
         return AlertDialog(
           content: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
-                Divider( height: 20.0, color: Colors.transparent,),
-                Text(mensagem, style: TextStyle(fontSize: 25.0),),
-              ],
-            )
-          ),
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Image.asset(
+                'lib/assets/alerta.png',
+                width: 50,
+                height: 50,
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                mensagem,
+                style: TextStyle(fontSize: 25.0),
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("OK"),

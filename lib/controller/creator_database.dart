@@ -52,7 +52,30 @@ class DatabaseCreator {
   static const produtoPVenda = "pvenda";
   static const produtoSaldoGeral = "saldo_geral";
   static const produtoUnidade = "produto_unidade";
-  
+
+  //Tabela municipios
+  static const tabelaMunicipios = "municipios";
+  static const municipioId = "id_municipio";
+  static const municipioNome = "municipio_nome";
+  static const municipioEstado = "municipio_estado";
+  static const municipioPaisNome = "pais_nome";
+  static const municipioidPessoa = "id_pessoa";
+
+  //tabela de formas de pagamentos
+  static const tabelaPagamentos = "formas_pagtos";
+  static const pagamentoId = "id";
+  static const pagamentoDescricao = "descricao";
+  static const pagamentoQtdParcelas = "qtdade_parc";
+  static const pagamentoStatus = "status";
+
+  //tabela tipo clientes
+  static const tabelaTipoClientes = "clientes_tipos";
+  static const clienteTipoId = "id";
+  static const clienteTipoDesc = "descricao";
+  static const clienteTipoStatus = "status";
+
+
+
 
   Future<void> createTodoTable(Database db) async{
     final todoSql = '''CREATE TABLE $tabelaPedidos
@@ -103,9 +126,47 @@ class DatabaseCreator {
       UNIQUE($produtoIdProduto)
     )
     ''';
+
+    //Criando a tabela de municipios
+    final municipiosSql = '''CREATE TABLE $tabelaMunicipios
+    (
+      $municipioidPessoa INTEGER,
+      $municipioId INTEGER PRIMARY KEY,
+      $municipioNome TEXT,
+      $municipioEstado TEXT,
+      $municipioPaisNome TEXT,
+      UNIQUE($municipioidPessoa)
+    )
+    ''';
+
+    //Criando a tebela de formas de pagamento
+    final pagamentosSql = '''CREATE TABLE $tabelaPagamentos
+    (
+      $pagamentoId INTEGER PRIMARY KEY,
+      $pagamentoDescricao TEXT,
+      $pagamentoQtdParcelas INTEGER,
+      $pagamentoStatus INTEGER,
+      UNIQUE($pagamentoId)
+    )
+    ''';
+
+    //Criando a tabela de tipos de clientes
+    final tipoClienteSql = '''CREATE TABLE $tabelaTipoClientes
+    (
+      $clienteTipoId INTEGER PRIMARY KEY,
+      $clienteTipoDesc TEXT,
+      $clienteTipoStatus INTEGER,
+      UNIQUE($pagamentoId)
+    )
+    ''';
+
+
     await db.execute(todoSql);
     await db.execute(clienteSql);
     await db.execute(produtosSql);
+    await db.execute(municipiosSql);
+    await db.execute(pagamentosSql);
+    await db.execute(tipoClienteSql);
   }
 
   Future<String> getDatabasePath (String dbName)async{

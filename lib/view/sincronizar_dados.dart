@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:forca_de_vendas/controller/functions.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
+import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/model/produto.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
@@ -18,6 +21,7 @@ class SincronizarDados extends StatefulWidget {
 class _SincronizarDadosState extends State<SincronizarDados> {
   //Minhas variáveis
   String host;
+  String token = "YWRtaW46YWRtaW4=";
 
   @override
   void initState() {
@@ -117,24 +121,38 @@ class _SincronizarDadosState extends State<SincronizarDados> {
 
               Divider(height: 20.0,),
               Container(
-                child: ButtonTheme(
-                  height: 60.0,
-                    child: RaisedButton(
-                      onPressed: () {
-                        _showDialogConfirm();
-                      },
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.cloud_download,size: 40,),
-                          Text("Sincronizar com Servidor de Dados",
-                            style: TextStyle(color: Colors.black, fontSize:18),
-                          ),
-                        ],
-                      ),
-                    color: Color.fromARGB(100, 255, 183, 50),
+                height: 60,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Color(0xFF3C5A99),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5),
                   ),
                 ),
-              )
+                child: SizedBox.expand(
+                  child: FlatButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(Icons.sync, size: 50, color: Colors.white,),
+                        Text("  "),
+                        Text(
+                          "Sincronizar",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      _showDialogConfirm();
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
          ),
@@ -156,40 +174,57 @@ class _SincronizarDadosState extends State<SincronizarDados> {
       return Navigator.push(context, MaterialPageRoute(builder: (context) => TelaConfiguracao()),);
     }
 
-    //criando a string para buscar os produtos do servidor
-    String url = "http://$host:5005/api/lotuserpcgi.exe/forcavendas/getprodutos?idempresa=${usuario.empresaId}";
-
-    //Lista de usuários
-    var produtos = new List<Produto>();
-
     try{
-      //Criando a resposta do servidor para a busca de produtos
-      var resposta = await http.get(url);
-      //Verifica se a resposta foi correta
-      if(resposta.statusCode == 200){
-        final list = json.decode(resposta.body).cast<Map<String, dynamic>>();
-        List<Produto> produtos = list.map<Produto>((json) {
-          return Produto.fromJson(json);
-        }).toList();
+      /*LISTA DE PRODUTOS*/
+      var respostaProdutos = await http.get(
+        "http://$host:5005/forcavendas/getprodutos?idempresa=${usuario.empresaId}",
+        headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+      );
+      if(salvaProdutos(respostaProdutos)){
+        /*LISTA DE MUNICÍPIOS*/
+        var respostaMunicipios = await http.get(
+          "http://$host:5005/forcavendas/getmunicipios?idcolaborador=${usuario.colaboradorId}",
+          headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+        );
 
-        //Adicionando os produtos no banco de dados
-        for(Produto p in produtos){
-          print("Código: ${p.idProduto} -- Referência: ${p.grupoNome}");
-          Future<int> response = RepositoryServiceProdutos.addProduto(p);
-          response.then((data){
-            //print(data);
-          });
+        if(salvaMunicipios(respostaMunicipios)){
+          /*LISTA DE FORMAS DE PAGAMENTO*/
+          var respostaFormaPagamento = await http.get(
+            "http://$host:5005/forcavendas/getformaspagtos?idempresa=${usuario.empresaId}",
+            headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+          );
+
+          if(salvaFormasPagamento(respostaFormaPagamento)){
+            /*LISTA DE FORMAS DE PAGAMENTO*/
+            var respostaTiposCliente = await http.get(
+              "http://$host:5005/forcavendas/getclientestipos",
+              headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+            );
+
+            if(salvaTipoClientes(respostaTiposCliente)){
+              Navigator.pop(context);
+              _exibeSuccess();
+            }else{
+              print("Erro ao adicionar os tipos de clientes");
+              Navigator.pop(context);
+              _errorAlert("2");
+            }
+
+          }else{
+            print("Erro ao adicionar as formas de pagamento");
+            Navigator.pop(context);
+            _errorAlert("2");
+          }
+        }else{
+          print("Erro ao adicionar os municípios");
+          Navigator.pop(context);
+          _errorAlert("2");
         }
-
-        //Exibe que tudo deu certo
-        Navigator.pop(context);
-        _exibeSuccess();
       }else{
-        //Mostra erro de retorno
+        print("Erro ao adicionar os produtos");
         Navigator.pop(context);
         _errorAlert("2");
       }
-
     }catch (e){
       //Mostra erro de internet
       Navigator.pop(context);
