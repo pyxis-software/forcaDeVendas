@@ -33,7 +33,7 @@ class _DadosProdutoState extends State<DadosProduto> {
                       Container(
                         width: (MediaQuery.of(context).size.width) * 0.4,
                         height: (MediaQuery.of(context).size.height) * 0.2,
-                        child: Image.network('https://www.shoppingcidade.com.br/media/catalog/product/cache/8755e169cc75063c0efdca7d840c4280/r/e/refrigerante-lata-350-ml-coca-cola-spoleto-shopping-cidade.jpg'),
+                        child: Text(""),
                       ),
                       Container(
                         width: (MediaQuery.of(context).size.width) * 0.55,

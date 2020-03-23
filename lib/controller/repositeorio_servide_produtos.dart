@@ -53,6 +53,8 @@ class RepositoryServiceProdutos{
     return res;
   }
 
+  /*
+
   static Future<void> deletePedido(Cliente c) async{
     Database db = await database.database;
     final sql = '''DELETE FROM ${DatabaseCreator.tabelaClientes}
@@ -77,10 +79,11 @@ class RepositoryServiceProdutos{
 
     final result = await db.rawUpdate(sql);
   }
+  */
 
-  static contClientes() async{
+  static contProdutos() async{
     Database db = await database.database;
-    final data = await db.rawQuery('''SELECT COUNT(*) FROM ${DatabaseCreator.tabelaClientes}''');
+    final data = await db.rawQuery('''SELECT COUNT(*) FROM ${DatabaseCreator.tabelaProdutos}''');
 
     int count = data[0].values.elementAt(0);
     return count;

@@ -1,12 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/functions.dart';
-import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
-import 'package:forca_de_vendas/model/municipio.dart';
-import 'package:forca_de_vendas/model/produto.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:http/http.dart' as http;
@@ -202,8 +196,34 @@ class _SincronizarDadosState extends State<SincronizarDados> {
             );
 
             if(salvaTipoClientes(respostaTiposCliente)){
-              Navigator.pop(context);
-              _exibeSuccess();
+              /*LISTA DE STATUS DE CLIENTES*/
+              var respostaStatusClientes = await http.get(
+                "http://$host:5005/forcavendas/getclientesstatus",
+                headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+              );
+
+              if(salvaStatusCliente(respostaStatusClientes)){
+
+                /*LISTA DE STATUS DE CLIENTES*/
+                var respostaClientes = await http.get(
+                  "http://$host:5005/forcavendas/getclientes?idvendedor=${usuario.colaboradorId}",
+                  headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+                );
+
+                if(salvaClientes(respostaClientes)){
+                  Navigator.pop(context);
+                  _exibeSuccess();
+                }else{
+                  print("Erro ao adicionar os clientes");
+                  Navigator.pop(context);
+                  _errorAlert("2");
+                }
+                
+              }else{
+                print("Erro ao adicionar os status dos clientes");
+                Navigator.pop(context);
+                _errorAlert("2");
+              }
             }else{
               print("Erro ao adicionar os tipos de clientes");
               Navigator.pop(context);

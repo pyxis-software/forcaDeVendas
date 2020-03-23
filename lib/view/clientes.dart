@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/creator_database.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
 import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
-import 'package:forca_de_vendas/view/TelaLogin.dart';
+import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/view/dados_cliente.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';  
@@ -58,7 +57,7 @@ class _ClientesState extends State<Clientes> {
             children: <Widget>[
               Container(
                 child: Padding(
-                  padding: EdgeInsets.all(10.0),
+                  padding: EdgeInsets.all(2.0),
                   child: Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -71,8 +70,8 @@ class _ClientesState extends State<Clientes> {
                         ),
                         TextFormField(
                           controller: _controllerPesquisa,
-                          onChanged: (value)=>{
-                            salvaTexto(value)
+                          onChanged: (value){
+                            salvaTexto(value);
                           },
                           keyboardType: TextInputType.text,
                           style: new TextStyle(color: Colors.blueAccent, fontSize: 20),
@@ -120,7 +119,6 @@ class _ClientesState extends State<Clientes> {
                             child: _criaLista(),
                           ),
                         ),
-                        
                       ],
                     ),
                   ),
@@ -219,9 +217,13 @@ class _ClientesState extends State<Clientes> {
           
           child: GestureDetector(
             onTap: (){
-              Navigator.push(
-                context,MaterialPageRoute(builder: (context) => DadosCliente(c: clientes[index],),
+              Municipio m;
+              RepositoryServiceMunicipios.getMunicipio(clientes[index].idMunicipio).then((municipio){
+                m = municipio;
+                Navigator.push(
+                context,MaterialPageRoute(builder: (context) => DadosCliente(c: clientes[index], municipio: m,),
                 ));
+              });
             },
             child: Column(
               children: <Widget>[
@@ -232,9 +234,9 @@ class _ClientesState extends State<Clientes> {
                     children: [
                       TableRow(
                         children: [
-                          Text("${clientes[index].codigo}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold),),
-                          Text("${clientes[index].nome}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text("${clientes[index].cpf}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text("${clientes[index].id}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold),),
+                          Text("${clientes[index].nomeRazao}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text("${clientes[index].cpfCnpj}", overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.bold)),
                         ]
                       ),
                     ],

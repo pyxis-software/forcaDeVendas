@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forca_de_vendas/controller/functions.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/TelaInicial.dart';
@@ -65,6 +66,7 @@ class _TelaLoginState extends State<TelaLogin> {
             TextFormField(
               // autofocus: true,
               controller: _controllerUser,
+              textCapitalization: TextCapitalization.characters,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                 labelText: "Usuário",
@@ -80,6 +82,7 @@ class _TelaLoginState extends State<TelaLogin> {
               height: 10,
             ),
             TextFormField(
+              textCapitalization: TextCapitalization.characters,
               controller: _controllerPassword,
               // autofocus: true,
               keyboardType: TextInputType.text,

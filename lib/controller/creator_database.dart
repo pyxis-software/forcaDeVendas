@@ -21,16 +21,24 @@ class DatabaseCreator {
 
   //Tabela Clientes
   static const tabelaClientes = "clientes";
-  static const clienteCodigo = "codigo";
-  static const clienteCPF = "cpf";
-  static const clienteNome = "nome";
-  static const clienteEndereco = "endereco";
-  static const clienteBairro = "bairro";
-  static const clienteCidade = "cidade";
-  static const clienteEstado = "estado";
+  static const clienteId = "id";
+  static const clientetpPessoa = "tp_pessoa";
+  static const clienteCpf = "cpf_cnpj";
+  static const clienteNomeRazao = "nome_razao";
+  static const clienteApelido = "apelido_fantasia";
+  static const clienteRgInsc = "rg_insc";
+  static const clienteInscMunicipal = "insc_municipal";
+  static const clienteFone1 = "fone1";
+  static const clienteFone2 = "fone2";
+  static const clienteFone3 = "fone3";
   static const clienteCEP = "cep";
-  static const clienteTelefone = "telefone";
-  static const clienteCelular = "celular";
+  static const clienteEndereco = "endereco";
+  static const clienteEnderecoNumero = "endereco_numero";
+  static const clienteComplemento = "complemento";
+  static const clienteBairro = "bairro";
+  static const clienteIdMunicipio = "id_municipio";
+  static const clienteIdStatus = "id_status";
+  static const clienteIdClienteTipo = "id_cliente_tipo";
 
   //Tabela Produtos
   static const tabelaProdutos = "PRODUTOS";
@@ -74,6 +82,12 @@ class DatabaseCreator {
   static const clienteTipoDesc = "descricao";
   static const clienteTipoStatus = "status";
 
+  //tabela clientes status
+  static const tabelaClientesStatus = "clientes_status";
+  static const tabelaClientesStatusId = "id";
+  static const tabelaClientesStatusDescricao = "descricao";
+  static const tabelaClientesStatusBloqueiaPessoa = "bloque_pessoa";
+
 
 
 
@@ -89,17 +103,25 @@ class DatabaseCreator {
     )''';
     final clienteSql = '''CREATE TABLE $tabelaClientes
     (
-      $id INTEGER PRIMARY KEY AUTOINCREMENT,
-      $clienteCodigo INTEGER NOT NULL,
-      $clienteCPF TEXT,
-      $clienteNome TEXT,
-      $clienteEndereco TEXT,
-      $clienteBairro TEXT,
-      $clienteCidade TEXT,
-      $clienteEstado TEXT,
+      $clienteId INTEGER PRIMARY KEY,
+      $clientetpPessoa INTEGER,
+      $clienteCpf TEXT,
+      $clienteNomeRazao TEXT,
+      $clienteApelido TEXT,
+      $clienteRgInsc TEXT,
+      $clienteInscMunicipal INTEGER,
+      $clienteFone1 TEXT,
+      $clienteFone2 TEXT,
+      $clienteFone3 TEXT,
       $clienteCEP TEXT,
-      $clienteTelefone TEXT,
-      $clienteCelular TEXT
+      $clienteEndereco TEXT,
+      $clienteEnderecoNumero TEXT,
+      $clienteComplemento TEXT,
+      $clienteBairro TEXT,
+      $clienteIdMunicipio INTEGER,
+      $clienteIdStatus INTEGER,
+      $clienteIdClienteTipo INTEGER,
+      UNIQUE($clienteId)
     )
     ''';
 
@@ -156,7 +178,17 @@ class DatabaseCreator {
       $clienteTipoId INTEGER PRIMARY KEY,
       $clienteTipoDesc TEXT,
       $clienteTipoStatus INTEGER,
-      UNIQUE($pagamentoId)
+      UNIQUE($clienteTipoId)
+    )
+    ''';
+
+    //Criando a tabela de status de cliente
+    final clienteStatusSql = '''CREATE TABLE $tabelaClientesStatus
+    (
+      $tabelaClientesStatusId INTEGER PRIMARY KEY,
+      $tabelaClientesStatusDescricao TEXT,
+      $tabelaClientesStatusBloqueiaPessoa INTEGER,
+      UNIQUE($tabelaClientesStatusId)
     )
     ''';
 
@@ -167,6 +199,7 @@ class DatabaseCreator {
     await db.execute(municipiosSql);
     await db.execute(pagamentosSql);
     await db.execute(tipoClienteSql);
+    await db.execute(clienteStatusSql);
   }
 
   Future<String> getDatabasePath (String dbName)async{

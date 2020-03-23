@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_pagamentos.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_status_cliente.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_tipo_cliente.dart';
+import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
+import 'package:forca_de_vendas/model/cliente.dart';
+import 'package:forca_de_vendas/model/clientes_status.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/model/produto.dart';
@@ -197,6 +201,56 @@ bool salvaTipoClientes(http.Response resposta){
       for(TipoCliente tc in tiposCliente){
         RepositoryServiceTipoCliente.addTipoCliente(tc).then((id){
           //print("$id");
+        });
+      }
+      return true;
+    }
+  }else{
+    //erro
+    return false;
+  }
+}
+
+//salva os status dos clientes
+bool salvaStatusCliente(http.Response resposta){
+  //verifica se a resposta está correta
+  if(resposta.statusCode == 200){
+    //verifica se não houve algum erro de dados
+    if(resposta.body.toString().contains("MESSAGE")){
+      return false;
+    }else{
+      final listStatusCliente = json.decode(resposta.body).cast<Map<String, dynamic>>();
+      List<ClienteStatus> tiposCliente = listStatusCliente.map<ClienteStatus>((json) {
+        return ClienteStatus.fromJson(json);
+      }).toList();
+      for(ClienteStatus cs in tiposCliente){
+        RepositoryServiceClientesStatus.addStatusCliente(cs).then((id){
+          print("$id");
+        });
+      }
+      return true;
+    }
+  }else{
+    //erro
+    return false;
+  }
+}
+
+//Salva os clientes
+bool salvaClientes(http.Response resposta){
+  //verifica se a resposta está correta
+  if(resposta.statusCode == 200){
+    //verifica se não houve algum erro de dados
+    if(resposta.body.toString().contains("MESSAGE")){
+      return false;
+    }else{
+      final listClientes = json.decode(resposta.body).cast<Map<String, dynamic>>();
+      List<Cliente> tiposCliente = listClientes.map<Cliente>((json) {
+        return Cliente.fromJson(json);
+      }).toList();
+      for(Cliente c in tiposCliente){
+        RepositoryServiceCliente.addCliente(c).then((id){
+          print("$id");
         });
       }
       return true;

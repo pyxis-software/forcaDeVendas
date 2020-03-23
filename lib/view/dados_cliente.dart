@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
+import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/view/agendar_cliente.dart';
 import 'package:forca_de_vendas/view/financeiro.dart';
 
 class DadosCliente extends StatefulWidget {
   final Cliente c;
-
-  const DadosCliente({Key key, this.c}) : super(key: key);
+  final Municipio municipio;
+  const DadosCliente({Key key, this.c, this.municipio}) : super(key: key);
+  
   @override
   _DadosClienteState createState() => _DadosClienteState();
 }
 
 class _DadosClienteState extends State<DadosCliente> {
+
+  //Criando variáveis
 
   @override
   void setState(fn) {
@@ -21,14 +25,13 @@ class _DadosClienteState extends State<DadosCliente> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text("Dados do Cliente"),
       ),
       body: SingleChildScrollView(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
           child: Padding(
             padding: EdgeInsets.all(10.0),
             child:  Column(
@@ -59,7 +62,7 @@ class _DadosClienteState extends State<DadosCliente> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text("Código"),
-                                  Text("${widget.c.codigo}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold)),
+                                  Text("${widget.c.id}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ),
@@ -73,7 +76,7 @@ class _DadosClienteState extends State<DadosCliente> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text("CPF/CNPJ"),
-                                  Text("${widget.c.cpf}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
+                                  Text("${widget.c.cpfCnpj ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
                                 ],
                               ),
                             )
@@ -94,7 +97,7 @@ class _DadosClienteState extends State<DadosCliente> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text("Nome"),
-                      Text("${widget.c.nome}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                      Text("${widget.c.nomeRazao}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip,),
                     ],
                   ),
                 ),
@@ -156,7 +159,7 @@ class _DadosClienteState extends State<DadosCliente> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Cidade"),
-                                    Text("${widget.c.cidade}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.municipio.municipioNome}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -180,7 +183,7 @@ class _DadosClienteState extends State<DadosCliente> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Estado"),
-                                    Text("${widget.c.estado}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.municipio.municipioEstado}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -216,8 +219,8 @@ class _DadosClienteState extends State<DadosCliente> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("Telefone"),
-                                    Text("${widget.c.telefone}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("Telefone 1"),
+                                    Text("${widget.c.fone1 ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -229,8 +232,8 @@ class _DadosClienteState extends State<DadosCliente> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("Celular"),
-                                    Text("${widget.c.celular}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("Telefone 2"),
+                                    Text("${widget.c.fone2 ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -243,7 +246,7 @@ class _DadosClienteState extends State<DadosCliente> {
                   ),
                 ),
 
-                Divider(height: 100,),
+                Divider(height: 10.0, color: Colors.transparent,),
                 Container(
                   width: MediaQuery.of(context).size.width,
                   child: Column(

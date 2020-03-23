@@ -24,7 +24,6 @@ class _AgendarClienteState extends State<AgendarCliente> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           child: Padding(
             padding: EdgeInsets.all(10.0),
@@ -56,7 +55,7 @@ class _AgendarClienteState extends State<AgendarCliente> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text("Código"),
-                                  Text("${widget.cliente.codigo}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold)),
+                                  Text("${widget.cliente.id}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ),
@@ -70,7 +69,7 @@ class _AgendarClienteState extends State<AgendarCliente> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text("CPF/CNPJ"),
-                                  Text("${widget.cliente.cpf}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
+                                  Text("${widget.cliente.cpfCnpj}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
                                 ],
                               ),
                             )
@@ -91,7 +90,7 @@ class _AgendarClienteState extends State<AgendarCliente> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text("Nome"),
-                      Text("${widget.cliente.nome}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                      Text("${widget.cliente.nomeRazao}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                     ],
                   ),
                 ),

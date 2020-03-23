@@ -47,7 +47,7 @@ class _FinanceiroState extends State<Financeiro> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text("Nome"),
-                            Text("${widget.c.nome}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                            Text("${widget.c.nomeRazao}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                           ],
                         ),
                       ),
@@ -62,7 +62,7 @@ class _FinanceiroState extends State<Financeiro> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text("CPF/CNPJ"),
-                            Text("${widget.c.cpf}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                            Text("${widget.c.cpfCnpj}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                           ],
                         ),
                       ),

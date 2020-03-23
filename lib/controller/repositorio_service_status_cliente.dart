@@ -1,42 +1,61 @@
 import 'package:forca_de_vendas/controller/creator_database.dart';
-import 'package:forca_de_vendas/model/municipio.dart';
+import 'package:forca_de_vendas/model/clientes_status.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-class RepositoryServiceMunicipios{
+class RepositoryServiceClientesStatus{
   static DatabaseCreator database = DatabaseCreator();
 
-  static Future<List<Municipio>> getAllMunicipos() async{
+  static Future<List<ClienteStatus>> getAllStatusCliente() async{
 
     Database db = await database.database;
-    List<Municipio> municipios = List();
+    List<ClienteStatus> status = List();
 
-    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaMunicipios}''';
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientesStatus}''';
     final data = await db.rawQuery(sql);
     for(final node in data){
-      final municipio = Municipio.fromJson(node);
-      municipios.add(municipio);
+      final st = ClienteStatus.fromJson(node);
+      status.add(st);
     }
-    return municipios;
+    return status;
   }
 
-  static Future<Municipio> getMunicipio(int codigo) async{
+  static Future<ClienteStatus> getClienteStatus(int id) async{
     Database db = await database.database;
-    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaMunicipios}
-    WHERE ${DatabaseCreator.municipioId} == $codigo''';
+    ClienteStatus cs;
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientesStatus}
+    WHERE ${DatabaseCreator.tabelaClientesStatusId} == $id''';
     final data = await db.rawQuery(sql);
-
-    final m = Municipio.fromJson(data[0]);
-    return m;
+    data.map((f){
+      cs = ClienteStatus.fromJson(f);
+    });
+    return cs;
   }
 
-  static Future<int> addMunicipio(Municipio m) async {
+  static Future <List<ClienteStatus>> buscaClintesStatus(String busca) async {
+    Database db = await database.database;
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientesStatus} 
+    WHERE ${DatabaseCreator.tabelaClientesStatusDescricao} LIKE "%$busca%" OR
+    ${DatabaseCreator.tabelaClientesStatusBloqueiaPessoa} LIKE "%$busca%"''';
+    final data = await db.rawQuery(sql);
+    List<ClienteStatus> statusClientes = List();
+
+    for(final node in data){
+      final status = ClienteStatus.fromJson(node);
+      statusClientes.add(status);
+    }
+    return statusClientes;
+  }
+
+  static Future<int> addStatusCliente(ClienteStatus cs) async {
     Database db = await database.database;
 
-    var res = await db.insert(DatabaseCreator.tabelaMunicipios, m.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
+    var res = await db.insert(DatabaseCreator.tabelaClientesStatus, cs.toMap(),conflictAlgorithm: ConflictAlgorithm.replace);
     return res;
   }
+
   /*
+
   static Future<void> deletePedido(Cliente c) async{
     Database db = await database.database;
     final sql = '''DELETE FROM ${DatabaseCreator.tabelaClientes}
@@ -62,10 +81,10 @@ class RepositoryServiceMunicipios{
     final result = await db.rawUpdate(sql);
   }
   */
-
-  static contMunicipios() async{
+  static contClienteStatus() async{
     Database db = await database.database;
-    final data = await db.rawQuery('''SELECT COUNT(*) FROM ${DatabaseCreator.tabelaMunicipios}''');
+    final data = await db.rawQuery('''SELECT COUNT(*) FROM ${DatabaseCreator.tabelaClientesStatus}''');
+
     int count = data[0].values.elementAt(0);
     return count;
   }

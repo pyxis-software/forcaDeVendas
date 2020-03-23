@@ -33,9 +33,9 @@ class RepositoryServiceCliente{
   static Future <List<Cliente>> buscaCliente(String busca) async {
     Database db = await database.database;
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes} 
-    WHERE ${DatabaseCreator.clienteNome} LIKE "%$busca%" OR
-    ${DatabaseCreator.clienteCodigo} LIKE "%$busca%" OR
-    ${DatabaseCreator.clienteCPF} LIKE "%$busca%"''';
+    WHERE ${DatabaseCreator.clienteNomeRazao} LIKE "%$busca%" OR
+    ${DatabaseCreator.clienteApelido} LIKE "%$busca%" OR
+    ${DatabaseCreator.clienteId} LIKE "%$busca%"''';
     final data = await db.rawQuery(sql);
     List<Cliente> clientes = List();
 
@@ -52,6 +52,8 @@ class RepositoryServiceCliente{
     final result = await db.insert(DatabaseCreator.tabelaClientes, c.toMap());
     return result;
   }
+
+  /*
 
   static Future<void> deletePedido(Cliente c) async{
     Database db = await database.database;
@@ -74,9 +76,9 @@ class RepositoryServiceCliente{
     ${DatabaseCreator.clienteEstado} = "${c.estado}",
     WHERE ${DatabaseCreator.codigo} = ${c.codigo}
     ''';
-
     final result = await db.rawUpdate(sql);
   }
+  */
 
   static contClientes() async{
     Database db = await database.database;
