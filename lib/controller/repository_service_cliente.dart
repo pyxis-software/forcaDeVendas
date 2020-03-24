@@ -48,8 +48,7 @@ class RepositoryServiceCliente{
 
   static Future<int> addCliente(Cliente c) async {
     Database db = await database.database;
-    
-    final result = await db.insert(DatabaseCreator.tabelaClientes, c.toMap());
+    final result = await db.insert(DatabaseCreator.tabelaClientes, c.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     return result;
   }
 

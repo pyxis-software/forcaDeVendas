@@ -15,6 +15,7 @@ class TelaProdutos extends StatefulWidget {
 
 class _TelaProdutosState extends State<TelaProdutos> {
   //Minhas alterações'
+  final Color blue = Color(0xFF3C5A99);
   final _controllerPesquisa =  TextEditingController();
   String host;
   ProgressDialog load;
@@ -43,6 +44,7 @@ class _TelaProdutosState extends State<TelaProdutos> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Produtos"),
+          backgroundColor: blue,
         ),
         body: SingleChildScrollView(
           child: Container(

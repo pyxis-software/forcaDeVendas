@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/functions.dart';
+import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
+import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:http/http.dart' as http;
@@ -14,20 +17,24 @@ class SincronizarDados extends StatefulWidget {
 
 class _SincronizarDadosState extends State<SincronizarDados> {
   //Minhas variáveis
+  final Color blue = Color(0xFF3C5A99);
   String host;
   String token = "YWRtaW46YWRtaW4=";
+  String messageLog;
+  double percent;
 
   @override
   void initState() {
     super.initState();
-
     //iniciando a busca pelo host
     buscaHost();
+    percent = 0.0;
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
+         backgroundColor: Color(0xFF3C5A99),
          title: Text("Sincronizar Dados"),
        ),
        body: SingleChildScrollView(
@@ -174,51 +181,58 @@ class _SincronizarDadosState extends State<SincronizarDados> {
         "http://$host:5005/forcavendas/getprodutos?idempresa=${usuario.empresaId}",
         headers: {HttpHeaders.authorizationHeader: "Basic $token"},
       );
-      if(salvaProdutos(respostaProdutos)){
+      if(salvaProdutos(respostaProdutos, percent)){
+        setState(() {
+          percent += 0.1;
+        });
         /*LISTA DE MUNICÍPIOS*/
         var respostaMunicipios = await http.get(
           "http://$host:5005/forcavendas/getmunicipios?idcolaborador=${usuario.colaboradorId}",
           headers: {HttpHeaders.authorizationHeader: "Basic $token"},
         );
 
-        if(salvaMunicipios(respostaMunicipios)){
+        if(salvaMunicipios(respostaMunicipios, percent)){
+          setState(() {
+            percent += 0.1;
+          });
           /*LISTA DE FORMAS DE PAGAMENTO*/
           var respostaFormaPagamento = await http.get(
             "http://$host:5005/forcavendas/getformaspagtos?idempresa=${usuario.empresaId}",
             headers: {HttpHeaders.authorizationHeader: "Basic $token"},
           );
 
-          if(salvaFormasPagamento(respostaFormaPagamento)){
+          if(salvaFormasPagamento(respostaFormaPagamento, percent)){
+            setState(() {
+              percent += 0.1;
+            });
             /*LISTA DE FORMAS DE PAGAMENTO*/
             var respostaTiposCliente = await http.get(
               "http://$host:5005/forcavendas/getclientestipos",
               headers: {HttpHeaders.authorizationHeader: "Basic $token"},
             );
 
-            if(salvaTipoClientes(respostaTiposCliente)){
+            if(salvaTipoClientes(respostaTiposCliente, percent)){
+              setState(() {
+                percent += 0.1;
+              });
               /*LISTA DE STATUS DE CLIENTES*/
               var respostaStatusClientes = await http.get(
                 "http://$host:5005/forcavendas/getclientesstatus",
                 headers: {HttpHeaders.authorizationHeader: "Basic $token"},
               );
 
-              if(salvaStatusCliente(respostaStatusClientes)){
-
-                /*LISTA DE STATUS DE CLIENTES*/
-                var respostaClientes = await http.get(
-                  "http://$host:5005/forcavendas/getclientes?idvendedor=${usuario.colaboradorId}",
+              if(salvaStatusCliente(respostaStatusClientes, percent)){
+                var respostaFinanceiroClientes = await http.get(
+                  "http://$host:5005/forcavendas/getclientesfinanceiro?idvendedor=${usuario.colaboradorId}",
                   headers: {HttpHeaders.authorizationHeader: "Basic $token"},
                 );
-
-                if(salvaClientes(respostaClientes)){
-                  Navigator.pop(context);
-                  _exibeSuccess();
+                if(salvaFinanceiroCliente(respostaFinanceiroClientes)){
+                  //
                 }else{
-                  print("Erro ao adicionar os clientes");
+                  print("Erro ao adicionar as finanças dos clientes");
                   Navigator.pop(context);
                   _errorAlert("2");
                 }
-                
               }else{
                 print("Erro ao adicionar os status dos clientes");
                 Navigator.pop(context);
@@ -250,10 +264,62 @@ class _SincronizarDadosState extends State<SincronizarDados> {
       Navigator.pop(context);
       _errorAlert("1");
     }
-    
 
-
+    //salvando os clientes
+    _salvaClientes(usuario);
   }
+
+  _salvaClientes(Usuario usuario) async {
+    //Buscando a lista de clientes
+    List<Cliente> clientes = List<Cliente>();
+    List<Cliente> clientesEnviaAPI = List<Cliente>();
+    RepositoryServiceCliente.getAllClientes().then((lista){
+      clientes = lista;
+      //buscando os clientes da API
+      var respostaFinanceiroClientes = http.get(
+        "http://$host:5005/forcavendas/getclientes?idvendedor=${usuario.colaboradorId}",
+        headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+      );
+      respostaFinanceiroClientes.then((data){
+        if(data.statusCode == 200){
+          final listaClientes = json.decode(data.body).cast<Map<String, dynamic>>();
+          List<Cliente> clientesLista = listaClientes.map<Cliente>((json) {
+            return Cliente.fromJson(json);
+          }).toList();
+
+          //Percorrendo os clientes do banco
+          for(Cliente banco in clientes){
+            bool existe = false;
+            //percorrendo todos os cliente vindos da API
+            for(Cliente api in clientesLista){
+              if(banco.id == api.id){
+                existe = true;
+              }
+            }
+
+            if(!existe){
+              //adiciona o cliente na lista para enviar para api
+              clientesEnviaAPI.add(banco);
+            }
+
+          }
+          print("Total de clientes a serem enviados: ${clientesEnviaAPI.length}");
+
+          //envia para o servidor
+          //sai da funcao
+          salvaDataSync();
+          Navigator.pop(context);
+          _exibeSuccess();
+
+        }else{
+          print("Erro ao buscar clientes da API");
+          Navigator.pop(context);
+          _errorAlert("2");
+        }
+      });
+    });
+  }
+
   void buscaHost() async{
     final pref = await SharedPreferences.getInstance();
     String h = pref.getString('host');
@@ -309,12 +375,17 @@ class _SincronizarDadosState extends State<SincronizarDados> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.0),
             ),
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                CircularProgressIndicator(
+                Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(
+                    ),
+                    Text("  "),
+                    Text("Sincronizando...", style: TextStyle(fontSize: 25.0),),
+                  ],
                 ),
-                Text("  "),
-                Text("Sincronizando...", style: TextStyle(fontSize: 25.0),),
               ],
             ),
           ),

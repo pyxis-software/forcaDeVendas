@@ -39,6 +39,9 @@ class DatabaseCreator {
   static const clienteIdMunicipio = "id_municipio";
   static const clienteIdStatus = "id_status";
   static const clienteIdClienteTipo = "id_cliente_tipo";
+  static const clienteLimiteCredito = "limite_credito";
+  static const clienteLimitePendente = "total_pendente";
+  static const clienteLimiteDisponivel = "limite_disponivel";
 
   //Tabela Produtos
   static const tabelaProdutos = "PRODUTOS";
@@ -88,6 +91,16 @@ class DatabaseCreator {
   static const tabelaClientesStatusDescricao = "descricao";
   static const tabelaClientesStatusBloqueiaPessoa = "bloque_pessoa";
 
+  //Tabela financeiros
+  static const tabelaClientesFinanceiro = "clientes_financeiro";
+  static const tabelaClientesFinanceiroId = "id";
+  static const tabelaClientesFinanceiroIdCliente = "id_cliente";
+  static const tabelaClientesFinanceiroIdvenda = "id_venda";
+  static const tabelaClientesFinanceiroDataVenc= "data_vecto";
+  static const tabelaClientesFinanceiroValor = "valor_doc";
+  static const tabelaClientesFinanceiroNumParcelas = "parc_num";
+  static const tabelaClientesFinanceiroQtdParcelas = "parc_qtd";
+
 
 
 
@@ -121,6 +134,9 @@ class DatabaseCreator {
       $clienteIdMunicipio INTEGER,
       $clienteIdStatus INTEGER,
       $clienteIdClienteTipo INTEGER,
+      $clienteLimiteCredito INTEGER,
+      $clienteLimitePendente DOUBLE,
+      $clienteLimiteDisponivel DOUBLE,
       UNIQUE($clienteId)
     )
     ''';
@@ -192,6 +208,20 @@ class DatabaseCreator {
     )
     ''';
 
+    //Criando a tabela de financeiro do cliente
+    final clientesFinanceiro = '''CREATE TABLE $tabelaClientesFinanceiro
+    (
+      $tabelaClientesFinanceiroId INTEGER PRIMARY KEY,
+      $tabelaClientesFinanceiroIdCliente INTEGER,
+      $tabelaClientesFinanceiroIdvenda INTEGER,
+      $tabelaClientesFinanceiroDataVenc TEXT,
+      $tabelaClientesFinanceiroValor REAL,
+      $tabelaClientesFinanceiroNumParcelas INTEGER,
+      $tabelaClientesFinanceiroQtdParcelas INTEGER,
+      UNIQUE($tabelaClientesFinanceiroId)
+    )
+    ''';
+
 
     await db.execute(todoSql);
     await db.execute(clienteSql);
@@ -200,6 +230,7 @@ class DatabaseCreator {
     await db.execute(pagamentosSql);
     await db.execute(tipoClienteSql);
     await db.execute(clienteStatusSql);
+    await db.execute(clientesFinanceiro);
   }
 
   Future<String> getDatabasePath (String dbName)async{

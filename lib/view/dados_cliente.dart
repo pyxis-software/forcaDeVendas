@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_financeiro.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/view/agendar_cliente.dart';
@@ -16,7 +17,7 @@ class DadosCliente extends StatefulWidget {
 class _DadosClienteState extends State<DadosCliente> {
 
   //Criando variáveis
-
+  final Color blue = Color(0xFF3C5A99);
   @override
   void setState(fn) {
     // TODO: implement setState
@@ -28,6 +29,7 @@ class _DadosClienteState extends State<DadosCliente> {
     
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: blue,
         title: Text("Dados do Cliente"),
       ),
       body: SingleChildScrollView(

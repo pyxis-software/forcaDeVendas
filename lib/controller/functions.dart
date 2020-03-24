@@ -1,9 +1,8 @@
-
 import 'dart:convert';
-
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_financeiro.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_pagamentos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_status_cliente.dart';
@@ -11,6 +10,7 @@ import 'package:forca_de_vendas/controller/repositorio_service_tipo_cliente.dart
 import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/clientes_status.dart';
+import 'package:forca_de_vendas/model/financeiro.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/model/produto.dart';
@@ -22,6 +22,7 @@ import 'package:forca_de_vendas/view/financeiro.dart';
 import 'package:forca_de_vendas/view/produtos.dart';
 import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 var db;
 
@@ -105,6 +106,13 @@ getDrawer(context) {
   );
 }
 
+//salva a data da última sincronização
+void salvaDataSync() async {
+  final pref = await SharedPreferences.getInstance();
+  final data = new DateTime.now();
+  pref.setString("data_sync", data.toString());
+}
+
 //Converte String em MD5
 String textToMd5 (String text) {
   return md5.convert(utf8.encode(text)).toString().toUpperCase();
@@ -113,7 +121,7 @@ String textToMd5 (String text) {
 //SALVANDO OS DADOS DO SINCRONISMO
 
 //produtos
-bool salvaProdutos(http.Response resposta){
+bool salvaProdutos(http.Response resposta, double percent){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     final listProdutos = json.decode(resposta.body).cast<Map<String, dynamic>>();
@@ -128,6 +136,8 @@ bool salvaProdutos(http.Response resposta){
         //print(data);
       });
     }
+    percent = percent + 0.1;
+    print(percent);
     return true;
   }else{
     //erro
@@ -136,7 +146,7 @@ bool salvaProdutos(http.Response resposta){
 }
 
 //municípios
-salvaMunicipios(http.Response resposta){
+salvaMunicipios(http.Response resposta, double percent){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -152,7 +162,10 @@ salvaMunicipios(http.Response resposta){
         RepositoryServiceMunicipios.addMunicipio(m).then((id){
           //print("$id");
         });
+
       }
+      percent += 0.1;
+      print(percent);
       return true;
     }
   }else{
@@ -162,7 +175,7 @@ salvaMunicipios(http.Response resposta){
 }
 
 //Salva formas de pagamento
-bool salvaFormasPagamento(http.Response resposta){
+bool salvaFormasPagamento(http.Response resposta, double percent){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -178,6 +191,8 @@ bool salvaFormasPagamento(http.Response resposta){
           //print("$id");
         });
       }
+      percent += 0.1;
+      print(percent);
       return true;
     }
   }else{
@@ -187,7 +202,7 @@ bool salvaFormasPagamento(http.Response resposta){
 }
 
 //Salva os tipos de clientes
-bool salvaTipoClientes(http.Response resposta){
+bool salvaTipoClientes(http.Response resposta, double percent){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -203,6 +218,8 @@ bool salvaTipoClientes(http.Response resposta){
           //print("$id");
         });
       }
+      percent += 0.1;
+      print(percent);
       return true;
     }
   }else{
@@ -212,7 +229,7 @@ bool salvaTipoClientes(http.Response resposta){
 }
 
 //salva os status dos clientes
-bool salvaStatusCliente(http.Response resposta){
+bool salvaStatusCliente(http.Response resposta, double percent){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -225,9 +242,11 @@ bool salvaStatusCliente(http.Response resposta){
       }).toList();
       for(ClienteStatus cs in tiposCliente){
         RepositoryServiceClientesStatus.addStatusCliente(cs).then((id){
-          print("$id");
+          //print("$id");
         });
       }
+      percent += 0.1;
+      print(percent);
       return true;
     }
   }else{
@@ -236,23 +255,26 @@ bool salvaStatusCliente(http.Response resposta){
   }
 }
 
-//Salva os clientes
-bool salvaClientes(http.Response resposta){
+
+//Salvando o financeiro dos clientes
+bool salvaFinanceiroCliente(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
     if(resposta.body.toString().contains("MESSAGE")){
       return false;
     }else{
-      final listClientes = json.decode(resposta.body).cast<Map<String, dynamic>>();
-      List<Cliente> tiposCliente = listClientes.map<Cliente>((json) {
-        return Cliente.fromJson(json);
+      final listFinanceiro= json.decode(resposta.body).cast<Map<String, dynamic>>();
+      List<FinanceiroCliente> tiposfin = listFinanceiro.map<FinanceiroCliente>((json) {
+        return FinanceiroCliente.fromJson(json);
       }).toList();
-      for(Cliente c in tiposCliente){
-        RepositoryServiceCliente.addCliente(c).then((id){
-          print("$id");
-        });
-      }
+      RepositoryServiceFinanceiro.deleteFromTable().then((data){
+        for(FinanceiroCliente f in tiposfin){
+          RepositoryServiceFinanceiro.addFinanceiro(f).then((id){
+            //print("$id");
+          });
+        }
+      });
       return true;
     }
   }else{

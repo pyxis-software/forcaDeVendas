@@ -238,7 +238,7 @@ class _FinanceiroState extends State<Financeiro> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Limite de Crédio"),
-                                    Text("R\$ 50.000,00", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("R\$ ${widget.c.limiteCredito}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -251,7 +251,7 @@ class _FinanceiroState extends State<Financeiro> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Limite Disponível"),
-                                    Text("R\$ 43.200,00", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("R\$ ${widget.c.limiteDisponivel}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),

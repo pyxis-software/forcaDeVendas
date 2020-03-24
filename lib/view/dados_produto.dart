@@ -11,10 +11,12 @@ class DadosProduto extends StatefulWidget {
 }
 
 class _DadosProdutoState extends State<DadosProduto> {
+  final Color blue = Color(0xFF3C5A99);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
+         backgroundColor: blue,
          title: Text("Dados do Produto"),
        ),
        body: SingleChildScrollView(

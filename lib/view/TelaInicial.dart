@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/controller/repositorio_service_pedido.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:forca_de_vendas/controller/functions.dart';
-import 'package:forca_de_vendas/model/pedido.dart';
-import 'package:forca_de_vendas/view/TelaLogin.dart';
+import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
+import 'package:forca_de_vendas/view/clientes.dart';
+import 'package:forca_de_vendas/view/produtos.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'TelaLogin.dart';
 
@@ -13,22 +13,18 @@ class TelaInicial extends StatefulWidget {
 }
 
 class _TelaInicialState extends State<TelaInicial> {
-  Future<List<Pedido>> pedidos;
-  var load;
-
-  final String url = 'https://static.independent.co.uk/s3fs-public/thumbnails/image/2018/09/04/15/lionel-messi-0.jpg?';
-  final Color green = Color(0xFF1E8161);
+  final Color blue = Color(0xFF3C5A99);
+  String dataSync;
   
   @override
   void initState() {
     // TODO: implement initState
-    load = true;
-    _getClientes();
   }
 
 
   @override
   Widget build(BuildContext context) {
+    _getDataSync();
     return Scaffold(
       //drawer: getDrawer(context),
       body: Column(
@@ -36,9 +32,9 @@ class _TelaInicialState extends State<TelaInicial> {
           Container(
             padding: EdgeInsets.only(top: 16),
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height/2,
+            height: MediaQuery.of(context).size.height/4,
             decoration: BoxDecoration(
-              color: green,
+              color: blue,
               borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(32),
                   bottomLeft: Radius.circular(32)
@@ -46,69 +42,9 @@ class _TelaInicialState extends State<TelaInicial> {
             ),
             child: Column(
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: Column(
-                        children: <Widget>[
-                          Text('Familiar',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                          Text('12',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: NetworkImage(url)
-                          )
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Column(
-                        children: <Widget>[
-                          Text('Following',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                          Text('18',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 10
-                  ),
-                  child: Text("ID: 14552566",
-                    style: TextStyle(
-                        color: Colors.white70
-                    ),
-                  ),
-                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 16, bottom: 32),
-                  child: Text('Herman Jimenez',
+                  child: Text('Bem Vindo!',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -119,48 +55,19 @@ class _TelaInicialState extends State<TelaInicial> {
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Column(
                         children: <Widget>[
-                          Icon(Icons.group_add, color: Colors.white,),
-                          Text('Friends',
+                          Icon(Icons.add_shopping_cart, color: Colors.white,),
+                          Text('Novo Pedido',
                             style: TextStyle(
                                 color: Colors.white
                             ),
                           ),
                         ],
                       ),
-                      Column(
-                        children: <Widget>[
-                          Icon(Icons.group, color: Colors.white,),
-                          Text('Groups',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Icon(Icons.videocam, color: Colors.white,),
-                          Text('Videos',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Icon(Icons.favorite, color: Colors.white,),
-                          Text('Likes',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                        ],
-                      )
+
                     ],
                   ),
                 )
@@ -176,38 +83,53 @@ class _TelaInicialState extends State<TelaInicial> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Icon(Icons.table_chart, color: Colors.grey,),
-                        Text('Leaders',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold
-                          ),
-                        )
-                      ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Clientes()),);
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Icon(Icons.people, color: blue,),
+                          Text('Clientes',
+                            style: TextStyle(
+                                color: blue,
+                                fontWeight: FontWeight.bold
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: <Widget>[
-                        Icon(Icons.show_chart, color: Colors.grey,),
-                        Text('Level up',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold
-                          ),
-                        )
-                      ],
+                    GestureDetector(
+                      onTap: (){
+
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Icon(Icons.shopping_cart, color: blue,),
+                          Text('Pedidos',
+                            style: TextStyle(
+                                color: blue,
+                                fontWeight: FontWeight.bold
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: <Widget>[
-                        Icon(Icons.card_giftcard, color: Colors.grey,),
-                        Text('Leaders',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold
-                          ),
-                        )
-                      ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TelaProdutos()),);
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Icon(Icons.local_offer, color: blue,),
+                          Text('Produtos',
+                            style: TextStyle(
+                                color: blue,
+                                fontWeight: FontWeight.bold
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -217,27 +139,88 @@ class _TelaInicialState extends State<TelaInicial> {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        Icon(Icons.code, color: Colors.grey,),
-                        Text('QR code')
+                        Icon(Icons.insert_drive_file, color: blue,),
+                        Text('Relatórios', style: TextStyle(
+                            color: blue,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
                       ],
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TelaConfiguracao()),);
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Icon(Icons.settings, color: blue,),
+                          Text('Configurações', style: TextStyle(
+                              color: blue,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     Column(
                       children: <Widget>[
-                        Icon(Icons.blur_circular, color: Colors.grey,),
-                        Text('Daily bonus')
-                      ],
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Icon(Icons.visibility, color: Colors.grey,),
-                        Text('Visitors')
+                        Icon(Icons.error_outline, color: blue,),
+                        Text('Sobre', style: TextStyle(
+                            color: blue,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ],
             ),
-          )
+          ),
+          Divider(height: 100, color: Colors.transparent,),
+          Padding(
+            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+            child: Container(
+              height: 200,
+              alignment: Alignment.centerLeft,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(left: 20.0, top: 20.0, bottom: 20.0, right: 20.0),
+                child: SizedBox.expand(
+                  child: FlatButton(
+                    child: Column(
+                      children: <Widget>[
+                        Text(dataSync, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Color(0xFF3C5A99),), textAlign: TextAlign.center,),
+                        Divider(height: 50, color: Colors.transparent,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.sync, size: 50, color: Color(0xFF3C5A99),),
+                            Text(
+                              "Sincronizar",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF3C5A99),
+                                fontSize: 35,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SincronizarDados()),);
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -283,131 +266,21 @@ class _TelaInicialState extends State<TelaInicial> {
     );
   }
 
-  //getClientes
-  _getClientes() async {
-    pedidos = RepositoryServicePedido.getAllPedidos();
-  }
-
-  //Lista os clientes
-  _getListPedidos(){
-    return FutureBuilder(
-      future: pedidos,
-      builder: (context, snapshot){
-        if(snapshot.hasData){
-          return _criaLista(snapshot);
+  void _getDataSync() async{
+    final pref = await SharedPreferences.getInstance();
+    final data = pref.getString('data_sync');
+    setState(() {
+      if(data == null){
+        dataSync = "Sincronize os dados com o servidor!";
+      }else{
+        final cont  = DateTime.now().difference(DateTime.parse(data));
+        if(cont.inDays > 0){
+          dataSync = "Última Sincronização realizada a $data atrás";
         }else{
-          return Container(
-            child: Text("Sem Pedidos!"),
-          );
+          dataSync = "Última Sincronização realizada hoje!";
         }
-      },
-    );
-  }
+      }
 
-  //Cria a visualização
- Widget _criaLista(pedido){
-    return Card(
-      elevation: 10.0,
-      child: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Container(
-              width: ( (MediaQuery.of(context).size.width*80) / 100),
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    textDirection: TextDirection.ltr,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${pedido.codigo}", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${pedido.cidade}", style: TextStyle(fontSize: 20.0),),
-                      )
-                    ],
-                  ),
-                  Divider(
-                    height: 10.0,
-                    color: Colors.transparent,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Flexible(
-                        child: Text(
-                        "${pedido.nome}",
-                        style: TextStyle(fontSize: 20.0,),
-                        overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    ],
-                  ),
-                  Divider(
-                    height: 10.0,
-                    color: Colors.transparent,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("${pedido.data}", style: TextStyle(fontSize: 20.0),),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 2.0, right: 10.0),
-                        child: Text("R\$ ${pedido.valor}", style: TextStyle(fontSize: 20.0, color: Colors.red,),),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    textDirection: TextDirection.ltr,
-                    children: <Widget>[
-                      Container(
-                        width: ( (MediaQuery.of(context).size.width*30) / 100),
-                        child: ButtonTheme(
-                          height: 20.0,
-                          child: RaisedButton(
-                            onPressed: () => {
-                              
-                            },
-                            color: Color.fromARGB(100, 255, 183, 50),
-                            child: Icon(
-                              Icons.edit
-                            )
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: ( (MediaQuery.of(context).size.width*20) / 100),
-                      ),
-                      Container(
-                        width: ( (MediaQuery.of(context).size.width*30) / 100),
-                        child: ButtonTheme(
-                          height: 30.0,
-                          child: RaisedButton(
-                            color: Color.fromARGB(100, 255, 183, 50),
-                            onPressed: () => {
-                              
-                            },
-                            child: Icon(
-                              Icons.restore_from_trash
-                            )
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            
-          ],
-        )
-      ),
-    );
+    });
   }
 }

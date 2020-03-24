@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Força de Vendas',
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
+      //theme: ThemeData(fontFamily: 'ModernSans'),
       routes: <String, WidgetBuilder>{
         '/': (context) => TelaSplash(),
         '/login': (context) => TelaLogin(),
