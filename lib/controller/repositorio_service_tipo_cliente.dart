@@ -10,7 +10,7 @@ class RepositoryServiceTipoCliente{
   static Future<List<TipoCliente>> getAllTipoCliente() async{
 
     Database db = await database.database;
-    List<TipoCliente> tipos = List();
+    List<TipoCliente> tipos = new List<TipoCliente>();
 
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaTipoClientes}''';
     final data = await db.rawQuery(sql);

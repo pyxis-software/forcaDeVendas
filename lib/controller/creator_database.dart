@@ -7,17 +7,23 @@ import 'package:path/path.dart';
 class DatabaseCreator {
   static Database _database;
 
-
-
   //Tabela Pedidos
-  static const tabelaPedidos = "PEDIDOS";
-  static const id = "ID";
-  static const nome = "NOME";
-  static const codigo = "CODIGO";
-  static const cidade = "CIDADE";
-  static const valor = "VALOR";
-  static const data = "DATA";
-  static const isFaturado = "IS_FATURADO";
+  static const tabelaVenda = "vendas";
+  static const vendasId = "id";
+  static const vendaIdEmpresa = "id_empresa";
+  static const vendaIdCliente = "id_cliente";
+  static const clienteCidade = "clienteCidade";
+  static const vendaIdVendedor = "id_vendedor";
+  static const vendaIdFormaPagamento = "id_fpagto";
+  static const vendaIdUsuario = "id_usuario";
+  static const vendaTotalBruto = "tot_bruto";
+  static const vendaDescontoParcela = "tot_desc_prc";
+  static const vendaDescontoValor = "tot_desc_vlr";
+  static const vendaTotalLiquido = "tot_liquido";
+  static const vendaData = "data_venda";
+  static const vendaStatus = "pedido_status";
+  static const vendaNFiscal = "pedido_nfiscal";
+  static const vendaNFiscalEmissao = "pedido_nfiscal_emissao";
 
   //Tabela Clientes
   static const tabelaClientes = "clientes";
@@ -42,6 +48,7 @@ class DatabaseCreator {
   static const clienteLimiteCredito = "limite_credito";
   static const clienteLimitePendente = "total_pendente";
   static const clienteLimiteDisponivel = "limite_disponivel";
+  static const clienteEmail = "email";
 
   //Tabela Produtos
   static const tabelaProdutos = "PRODUTOS";
@@ -101,19 +108,70 @@ class DatabaseCreator {
   static const tabelaClientesFinanceiroNumParcelas = "parc_num";
   static const tabelaClientesFinanceiroQtdParcelas = "parc_qtd";
 
-
-
+  //tabela itens do pedido
+  static const tabelaItensPedido = "itens_pedido";
+  static const tabelaItensPedidoId = "id";
+  static const tabelaItensIdVenda = "id_venda";
+  static const tabelaItensPedidoItem = "item";
+  static const tabelaItensIdProduto = "id_produto";
+  static const tabelaItensComplemento = "complemento";
+  static const tabelaItensValorVendido = "vlr_vendido";
+  static const tabelaItensQtd = "qtd_venda";
+  static const tabelaItensTotalBruto = "tot_bruto";
+  static const tabelaItensDescontoParcela = "vlr_desc_prc";
+  static const tabelaItensDescontoValor = "vlr_desc_vlr";
+  static const tabelaItensValorLiquido = "vlr_liquido";
+  static const tabelaItensGrade = "grade";
+  static const tabelaItensIdVendedor = "id_vendedor";
 
   Future<void> createTodoTable(Database db) async{
-    final todoSql = '''CREATE TABLE $tabelaPedidos
+    final todoSql = '''CREATE TABLE $tabelaVenda
     (
-      $nome TEXT,
-      $codigo INTEGER,
-      $cidade TEXT,
-      $valor INTEGER PRIMARY KEY,
-      $data TEXT,
-      $isFaturado BIT NOT NULL
+      $vendasId NTEGER PRIMARY KEY,
+      $vendaIdEmpresa INTEGER,
+      $vendaIdCliente INTEGER,
+      $clienteNomeRazao TEXT,
+      $clienteCidade TEXT,
+      $vendaIdVendedor INTEGER,
+      $vendaIdFormaPagamento INTEGER,
+      $vendaIdUsuario INTEGER,
+      $vendaTotalBruto DOUBLE,
+      $vendaDescontoParcela INTEGER,
+      $vendaDescontoValor "DOUBLE",
+      $vendaData TEXT,
+      $vendaTotalLiquido DOUBLE,
+      $vendaStatus INTEGER,
+      $vendaNFiscal INTEGER,
+      $vendaNFiscalEmissao TEXT,
+      UNIQUE($vendasId)
     )''';
+
+    final createtableItens = '''CREATE TABLE $tabelaItensPedido
+    (
+      $tabelaItensPedidoId NTEGER PRIMARY KEY,
+      $produtoIdProduto INTEGER,
+      $tabelaItensIdVenda INTEGER,
+      $tabelaItensQtd INTEGER,
+      $produtoIdEmpresa INTEGER,
+      $produtoDescricao TEXT,
+      $produtoRefFabrica TEXT,
+      $produtoGtin TEXT,
+      $produtoAplicacao TEXT,
+      $produtoPeso INTEGER,
+      $produtoIdFabricante INTEGER,
+      $produtoNomeFabricante TEXT,
+      $produtoIdGrupo INTEGER,
+      $produtoNomeGrupo TEXT,
+      $produtoIdSubGrupo INTEGER,
+      $produtoSubGrupoNome TEXT,
+      $produtoIdNcm TEXT,
+      $produtoGrade TEXT,
+      $produtoPVenda REAL,
+      $produtoSaldoGeral INTEGER,
+      $produtoUnidade TEXT,
+      UNIQUE($tabelaItensPedidoId)
+    )''';
+
     final clienteSql = '''CREATE TABLE $tabelaClientes
     (
       $clienteId INTEGER PRIMARY KEY,
@@ -137,6 +195,7 @@ class DatabaseCreator {
       $clienteLimiteCredito INTEGER,
       $clienteLimitePendente DOUBLE,
       $clienteLimiteDisponivel DOUBLE,
+      $clienteEmail TEXT,
       UNIQUE($clienteId)
     )
     ''';
@@ -224,6 +283,7 @@ class DatabaseCreator {
 
 
     await db.execute(todoSql);
+    await db.execute(createtableItens);
     await db.execute(clienteSql);
     await db.execute(produtosSql);
     await db.execute(municipiosSql);

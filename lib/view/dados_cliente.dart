@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_financeiro.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
+import 'package:forca_de_vendas/model/documento.dart';
+import 'package:forca_de_vendas/model/financeiro.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/view/agendar_cliente.dart';
 import 'package:forca_de_vendas/view/financeiro.dart';
@@ -124,7 +126,7 @@ class _DadosClienteState extends State<DadosCliente> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Endereço"),
-                                    Text("${widget.c.endereco}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.c.endereco ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip,),
                                   ],
                                 ),
                               ),
@@ -136,32 +138,27 @@ class _DadosClienteState extends State<DadosCliente> {
                         children: [
                           TableRow(
                             decoration: BoxDecoration(
-                              border: Border.all()
+                              border: Border.all(),
                             ),
                             children: [
                               Container(
                                 padding: EdgeInsets.all(5.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all()
-                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Bairro"),
-                                    Text("${widget.c.bairro}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.c.bairro ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip,),
                                   ],
                                 ),
                               ),
                               Container(
+
                                 padding: EdgeInsets.all(5.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all()
-                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Cidade"),
-                                    Text("${widget.municipio.municipioNome}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.municipio.municipioNome ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.clip,),
                                   ],
                                 ),
                               ),
@@ -177,28 +174,25 @@ class _DadosClienteState extends State<DadosCliente> {
                             ),
                             children: [
                               Container(
-                                padding: EdgeInsets.all(5.0),
                                 decoration: BoxDecoration(
-                                  border: Border.all()
+                                    border: Border.all()
                                 ),
+                                padding: EdgeInsets.all(5.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Estado"),
-                                    Text("${widget.municipio.municipioEstado}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.municipio.municipioEstado ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
                               Container(
                                 padding: EdgeInsets.all(5.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all()
-                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("CEP"),
-                                    Text("${widget.c.cep}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                                    Text("${widget.c.cep ?? ''}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                                   ],
                                 ),
                               ),
@@ -228,9 +222,6 @@ class _DadosClienteState extends State<DadosCliente> {
                               ),
                               Container(
                                 padding: EdgeInsets.all(5.0),
-                                decoration: BoxDecoration(
-                                  border: Border.all()
-                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
@@ -259,7 +250,36 @@ class _DadosClienteState extends State<DadosCliente> {
                         height: 60.0,
                         child: RaisedButton(
                           onPressed: ()  {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Financeiro(c : widget.c)),);
+                            //buscando o total de documentos
+                            RepositoryServiceFinanceiro.getAllClienteFinanceiro(widget.c.id).then((data){
+                              int atraso = 0;
+                              double totalAtraso = 0;
+                              int vencer = 0;
+                              double diasAtraso = 0;
+                              double totalAvencer = 0;
+                              double media = 0;
+                              for(FinanceiroCliente f in data){
+
+                                //Documento em atraso
+                                if(_isVencido(f.dataVecto)){
+                                  atraso += 1;
+                                  totalAtraso += f.valorDoc;
+                                  diasAtraso += _getTotalVencimento(f.dataVecto);
+                                }
+
+                                //documento a vencer
+                                if(!_isVencido(f.dataVecto)){
+                                  vencer += 1;
+                                  totalAvencer += f.valorDoc;
+                                }
+                              }
+                              media = ( diasAtraso/atraso );
+                              if(media.isNaN){
+                                media = 0;
+                              }
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Financeiro(c : widget.c, atraso: atraso, totalAtraso: totalAtraso, vencer: vencer, totalAvencer: totalAvencer, media: media.toInt(),)),);
+                            });
+
                           },
                           child: Center(
                             child: Row(
@@ -283,9 +303,8 @@ class _DadosClienteState extends State<DadosCliente> {
                       ButtonTheme(
                         height: 60.0,
                         child: RaisedButton(
-                          onPressed: () => {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AgendarCliente(cliente : widget.c)),)
-                          },
+                          onPressed: () =>
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AgendarCliente(cliente : widget.c)),),
                           child: Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -313,5 +332,26 @@ class _DadosClienteState extends State<DadosCliente> {
         ),
       )
     );
+  }
+
+  /*FUNÇÕES*/
+  bool _isVencido(d){
+    final data = d.split("/");
+    final time = DateTime(int.parse(data[2]), int.parse(data[1]), int.parse(data[0]));
+    final diferencia = time.difference(DateTime.now()).inDays;
+    if(diferencia >= 0){
+      return false;
+    }else{
+      return true;
+    }
+  }
+  _getTotalVencimento(d){
+    final data = d.split("/");
+    final time = DateTime(int.parse(data[2]), int.parse(data[1]), int.parse(data[0]));
+    final diferencia = time.difference(DateTime.now()).inDays;
+    if(diferencia < 0){
+      return (diferencia * -1);
+    }
+    return diferencia;
   }
 }

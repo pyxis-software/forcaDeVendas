@@ -1,38 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/produto.dart';
+import 'package:forca_de_vendas/model/usuario.dart';
+import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:forca_de_vendas/view/dados_produto.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-class TelaProdutos extends StatefulWidget {
+class TelaSelecionaItem extends StatefulWidget {
+  final List<Produto> produtos;
+  final int idVenda;
+
+  const TelaSelecionaItem({Key key, this.produtos, this.idVenda}) : super(key: key);
   @override
-  _TelaProdutosState createState() => _TelaProdutosState();
+  _TelaSelecionaItemState createState() => _TelaSelecionaItemState();
 }
 
-class _TelaProdutosState extends State<TelaProdutos> {
-  //Minhas alterações'
+class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
+  //lista de produtos
+  List<Produto> produtos;
   final Color blue = Color(0xFF3C5A99);
   final _controllerPesquisa = TextEditingController();
-  String host;
-  ProgressDialog load;
-  int cont = 0;
-  List<Produto> produtos;
-  DatabaseCreator database = DatabaseCreator();
+  int cont;
+  int idVenda;
+
+  //quantidade do produto
+  int qtd;
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+    produtos = widget.produtos;
+    idVenda = widget.idVenda;
+    cont = produtos.length;
+    qtd = 1;
   }
+
 
   @override
   Widget build(BuildContext context) {
     //Inicialização do processo
     if (produtos == null) {
       produtos = List<Produto>();
-      _getProdutos();
+      cont = produtos.length;
     }
 
     return Scaffold(
@@ -63,7 +76,7 @@ class _TelaProdutosState extends State<TelaProdutos> {
                       },
                       keyboardType: TextInputType.text,
                       style:
-                          new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                      new TextStyle(color: Colors.blueAccent, fontSize: 20),
                       decoration: InputDecoration(
                           border: new OutlineInputBorder(
                             borderSide: new BorderSide(),
@@ -109,44 +122,12 @@ class _TelaProdutosState extends State<TelaProdutos> {
     );
   }
 
-  //Buscando o Host da API
-  void buscaHost() async {
-    final pref = await SharedPreferences.getInstance();
-    String h = pref.getString('host');
-    String id = pref.getString('id_vend');
-    if (h != null && id != null) {
-      setState(() {
-        host = h;
-      });
-    }
-  }
-
-  //Buscando os produtos via API
-  _getProdutos() async {
-    final Future<Database> dbFuture = database.initDatabase();
-    dbFuture.then((data) {
-      Future<List<Produto>> produtoFuture =
-          RepositoryServiceProdutos.getAllProdutos();
-      produtoFuture.then((lista) {
-        setState(() {
-          produtos = lista;
-          cont = lista.length;
-        });
-      });
-    });
-  }
-
   //Buscando os produtos
   _buscaproduto(value) async {
-    final Future<Database> dbFuture = database.initDatabase();
-    dbFuture.then((data) {
-      Future<List<Produto>> produtoFuture =
-          RepositoryServiceProdutos.buscaProdutos(value);
-      produtoFuture.then((lista) {
-        setState(() {
-          produtos = lista;
-          cont = lista.length;
-        });
+    RepositoryServiceProdutos.buscaProdutos(value).then((lista) {
+      setState(() {
+        produtos = lista;
+        cont = lista.length;
       });
     });
   }
@@ -160,13 +141,7 @@ class _TelaProdutosState extends State<TelaProdutos> {
         return Container(
           child: GestureDetector(
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DadosProduto(
-                      produto: produtos[index],
-                    ),
-                  ));
+              _defineUnidadeProduto(produtos[index]);
             },
             child: Column(
               children: <Widget>[
@@ -237,6 +212,113 @@ class _TelaProdutosState extends State<TelaProdutos> {
           padding: EdgeInsets.all(5.0),
         );
       }).toList(),
+    );
+  }
+
+  _confirmProdutoSelecionado(Produto produto){
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text("Deseja confirmar o produto?", style: TextStyle(fontSize: 25.0),),
+                  Divider( height: 20.0, color: Colors.transparent,),
+                  Text("Descrição: ${produto.produtoDescricao}"),
+                  Divider( height: 5.0, color: Colors.transparent,),
+                  Text("Valor: R\$ ${produto.pvenda}"),
+                  Divider( height: 5.0, color: Colors.transparent,),
+                  Text("Quantidade: $qtd"),
+                ],
+              )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              padding: EdgeInsets.all(10.0),
+              child: new Text("Cancelar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            new FlatButton(
+              padding: EdgeInsets.all(10.0),
+              child: new Text("Confirmar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              onPressed: () {
+                _selecionaProduto(produto);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _selecionaProduto(Produto produto) async{
+    //buscando os dados do usuário do aplicativo
+    Usuario usuario;
+    //Buscando os dados do usuário do sistema
+    final pref = await SharedPreferences.getInstance();
+    final data = pref.getString('usuario');
+    if(data != null){
+      usuario = Usuario.fromJson(data);
+    }
+    //adicionando o produto no banco de itens
+    RepositoryServiceVendas.addItenVenda(produto, idVenda, qtd, usuario).then((result){
+      print("Item adicionado!");
+      Navigator.pop(context);
+      Navigator.pop(context);
+    });
+
+  }
+
+  void _defineUnidadeProduto(Produto produto) {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text("Informe a quantidade", style: TextStyle(fontSize: 25.0),),
+                  Divider( height: 20.0, color: Colors.transparent,),
+                  TextFormField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: false, signed: true),
+                    initialValue: "1",
+                    onChanged: (valor){
+                      setState(() {
+                        qtd = int.parse( valor );
+                      });
+                    },
+                    style:
+                    new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                    decoration: InputDecoration(
+                        border: new OutlineInputBorder(
+                          borderSide: new BorderSide(),
+                        ),
+                        labelStyle: TextStyle(color: Colors.blueAccent)),
+                  ),
+                ],
+              )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              padding: EdgeInsets.all(10.0),
+              child: new Text("Confirmar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              onPressed: () {
+                Navigator.pop(context);
+                _confirmProdutoSelecionado(produto);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

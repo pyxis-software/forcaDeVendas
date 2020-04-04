@@ -25,7 +25,6 @@ class RepositoryServiceMunicipios{
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaMunicipios}
     WHERE ${DatabaseCreator.municipioId} == $codigo''';
     final data = await db.rawQuery(sql);
-
     final m = Municipio.fromJson(data[0]);
     return m;
   }

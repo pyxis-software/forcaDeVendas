@@ -67,7 +67,7 @@ class _DadosProdutoState extends State<DadosProduto> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text("Referência"),
-                                  Text("${widget.produto.refFabrica}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
+                                  Text("${widget.produto.refFabrica == null? 'Sem referência' : widget.produto.refFabrica}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold),),
                                 ],
                               ),
                             )
@@ -216,7 +216,7 @@ class _DadosProdutoState extends State<DadosProduto> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Text("Preço Unitário"),
-                              Text("${widget.produto.pvenda}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
+                              Text("R\$ ${widget.produto.pvenda}", style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis,),
                             ],
                           ),
                         ),

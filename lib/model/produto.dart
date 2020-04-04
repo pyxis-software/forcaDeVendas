@@ -24,10 +24,10 @@ class Produto {
     final int idSubGrupo;
     final String subgrupoNome;
     final String idNcm;
-    final Ade grade;
+    final String grade;
     final double pvenda;
     final double saldoGeral;
-    final Ade produtoUnidade;
+    final String produtoUnidade;
 
     Produto({
         @required this.idEmpresa,
@@ -61,14 +61,14 @@ class Produto {
         int idFabricante,
         String fabricanteNome,
         int idGrupo,
-        GrupoNome grupoNome,
+        String grupoNome,
         int idSubGrupo,
-        GrupoNome subgrupoNome,
+        String subgrupoNome,
         String idNcm,
-        Ade grade,
+        String grade,
         double pvenda,
         double saldoGeral,
-        Ade produtoUnidade,
+        String produtoUnidade,
     }) => 
         Produto(
             idEmpresa: idEmpresa ?? this.idEmpresa,
@@ -106,10 +106,10 @@ class Produto {
         idSubGrupo: json["id_sub_grupo"],
         subgrupoNome: json["subgrupo_nome"],
         idNcm: json["id_ncm"],
-        grade: adeValues.map[json["grade"]],
+        grade: json["grade"],
         pvenda: json["pvenda"].toDouble(),
         saldoGeral: json["saldo_geral"].toDouble(),
-        produtoUnidade: adeValues.map[json["produto_unidade"]],
+        produtoUnidade: json["produto_unidade"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -127,10 +127,10 @@ class Produto {
         "id_sub_grupo": idSubGrupo,
         "subgrupo_nome": subgrupoNome,
         "id_ncm": idNcm,
-        "grade": adeValues.reverse[grade],
+        "grade": grade,
         "pvenda": pvenda,
         "saldo_geral": saldoGeral,
-        "produto_unidade": adeValues.reverse[produtoUnidade],
+        "produto_unidade": produtoUnidade,
     };
     Map<String, dynamic> toMap() => {
         "id_empresa": idEmpresa,
@@ -147,40 +147,9 @@ class Produto {
         "id_sub_grupo": idSubGrupo,
         "subgrupo_nome": subgrupoNome,
         "id_ncm": idNcm,
-        "grade": adeValues.reverse[grade],
+        "grade": grade,
         "pvenda": pvenda,
         "saldo_geral": saldoGeral,
-        "produto_unidade": adeValues.reverse[produtoUnidade],
+        "produto_unidade": produtoUnidade,
     };
-}
-
-enum Ade { UN, KG, CX }
-
-final adeValues = EnumValues({
-    "CX": Ade.CX,
-    "KG": Ade.KG,
-    "UN": Ade.UN
-});
-
-enum GrupoNome { COMODATOS, PADRAO, CERVEJAS_ESPECIAIS, CARNES }
-
-final grupoNomeValues = EnumValues({
-    "CARNES": GrupoNome.CARNES,
-    "CERVEJAS ESPECIAIS": GrupoNome.CERVEJAS_ESPECIAIS,
-    "COMODATOS": GrupoNome.COMODATOS,
-    "PADRAO": GrupoNome.PADRAO
-});
-
-class EnumValues<T> {
-    Map<String, T> map;
-    Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-        if (reverseMap == null) {
-            reverseMap = map.map((k, v) => new MapEntry(v, k));
-        }
-        return reverseMap;
-    }
 }

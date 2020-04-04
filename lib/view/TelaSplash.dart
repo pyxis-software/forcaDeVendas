@@ -25,6 +25,7 @@ class _TelaSplashState extends State<TelaSplash> {
   /*FUNCIONALIDADES*/
   verificaLogin() async {
         final pref = await SharedPreferences.getInstance();
+        pref.setString("data_sync", null);
         var auth = pref.getBool('auth');
         if(auth != null){
           //verifica se é true ou false

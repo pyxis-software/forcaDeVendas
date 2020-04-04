@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:forca_de_vendas/view/clientes.dart';
+import 'package:forca_de_vendas/view/pedidos.dart';
 import 'package:forca_de_vendas/view/produtos.dart';
 import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,7 @@ class _TelaInicialState extends State<TelaInicial> {
   @override
   void initState() {
     // TODO: implement initState
+    dataSync = "null";
   }
 
 
@@ -55,19 +57,24 @@ class _TelaInicialState extends State<TelaInicial> {
                 Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          Icon(Icons.add_shopping_cart, color: Colors.white,),
-                          Text('Novo Pedido',
-                            style: TextStyle(
-                                color: Colors.white
-                            ),
-                          ),
-                        ],
-                      ),
 
+                      GestureDetector(
+                        onTap: (){
+                          _showDialog();
+                        },
+                        child: Column(
+                          children: <Widget>[
+                            Icon(Icons.exit_to_app, color: Colors.white,),
+                            Text('Sair',
+                              style: TextStyle(
+                                  color: Colors.white
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 )
@@ -101,7 +108,7 @@ class _TelaInicialState extends State<TelaInicial> {
                     ),
                     GestureDetector(
                       onTap: (){
-
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => TelaPedidos()),);
                       },
                       child: Column(
                         children: <Widget>[
@@ -275,7 +282,8 @@ class _TelaInicialState extends State<TelaInicial> {
       }else{
         final cont  = DateTime.now().difference(DateTime.parse(data));
         if(cont.inDays > 0){
-          dataSync = "Última Sincronização realizada a $data atrás";
+          final d = DateTime.parse(data);
+          dataSync = "Última Sincronização realizada a $cont atrás";
         }else{
           dataSync = "Última Sincronização realizada hoje!";
         }

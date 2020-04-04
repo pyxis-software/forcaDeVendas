@@ -276,14 +276,14 @@ class _SincronizarDadosState extends State<SincronizarDados> {
     RepositoryServiceCliente.getAllClientes().then((lista){
       clientes = lista;
       //buscando os clientes da API
-      var respostaFinanceiroClientes = http.get(
+      var respostaClientes = http.get(
         "http://$host:5005/forcavendas/getclientes?idvendedor=${usuario.colaboradorId}",
         headers: {HttpHeaders.authorizationHeader: "Basic $token"},
       );
-      respostaFinanceiroClientes.then((data){
+      respostaClientes.then((data){
         if(data.statusCode == 200){
           final listaClientes = json.decode(data.body).cast<Map<String, dynamic>>();
-          List<Cliente> clientesLista = listaClientes.map<Cliente>((json) {
+          List<Cliente> listaAPI = listaClientes.map<Cliente>((json) {
             return Cliente.fromJson(json);
           }).toList();
 
@@ -291,25 +291,100 @@ class _SincronizarDadosState extends State<SincronizarDados> {
           for(Cliente banco in clientes){
             bool existe = false;
             //percorrendo todos os cliente vindos da API
-            for(Cliente api in clientesLista){
+            for(Cliente api in listaAPI){
               if(banco.id == api.id){
                 existe = true;
               }
             }
-
             if(!existe){
               //adiciona o cliente na lista para enviar para api
               clientesEnviaAPI.add(banco);
             }
-
           }
           print("Total de clientes a serem enviados: ${clientesEnviaAPI.length}");
 
-          //envia para o servidor
-          //sai da funcao
-          salvaDataSync();
-          Navigator.pop(context);
-          _exibeSuccess();
+          //se existir clientes para enviar, envia
+          if(clientesEnviaAPI.length > 0) {
+            //envia para o servidor
+            for (Cliente c in clientesEnviaAPI) {
+              Map<String, dynamic> toJson() =>
+                  {
+                    "id": 0,
+                    "tp_pessoa": c.tpPessoa,
+                    "cpf_cnpj": c.cpfCnpj,
+                    "nome_razao": c.nomeRazao,
+                    "apelido_fantasia": c.apelidoFantasia,
+                    "rg_insc": c.rgInsc,
+                    "insc_municipal": (c.inscMunicipal.isEmpty)? null : c.inscMunicipal,
+                    "fone1": c.fone1,
+                    "fone2": (c.fone2.isEmpty) ? null : c.fone2,
+                    "fone3": (c.fone3.isEmpty) ? null : c.fone3,
+                    "cep": c.cep,
+                    "endereco": c.endereco,
+                    "endereco_numero": c.enderecoNumero,
+                    "complemento": (c.complemento.isEmpty) ? null : c.complemento,
+                    "bairro": c.bairro,
+                    "id_municipio": c.idMunicipio,
+                    "id_status": c.idStatus,
+                    "id_cliente_tipo": c.idClienteTipo,
+                    "email": c.email,
+                    "id_vendedor": usuario.colaboradorId
+                  };
+              String dados = _convertToBase64(toJson().toString());
+              print(dados);
+              print(json.encode(toJson()));
+              try {
+                print("Enviando o cliente: ${c.nomeRazao}");
+                var respostaClientesEnviaAPI = http.get(
+                    "http://$host:5005/forcavendas/postclientes?objson=$dados",
+                    headers: {
+                      HttpHeaders.authorizationHeader: "Basic $token"
+                    },
+                );
+                respostaClientesEnviaAPI.then((data) {
+                  print(data.statusCode);
+                  if (data.statusCode == 200) {
+                    print("Retorno do cliente ${c.nomeRazao}:");
+                    //REMOVE O CLIENTE DO BANCO
+                    RepositoryServiceCliente.deleteCliente(c);
+                  } else {
+                    print("Erro ao enviar cliente para o servidor!");
+                    Navigator.pop(context);
+                    _errorAlert("2");
+                  }
+                });
+              } catch (e) {
+                print("Erro ao buscar clientes da API");
+                Navigator.pop(context);
+                _errorAlert("2");
+              }
+            }
+          }else{
+            var respostaClientes = http.get(
+              "http://$host:5005/forcavendas/getclientes?idvendedor=${usuario.colaboradorId}",
+              headers: {HttpHeaders.authorizationHeader: "Basic $token"},
+            );
+            respostaClientes.then((data) {
+              if (data.statusCode == 200) {
+                final listaClientes = json.decode(data.body).cast<
+                    Map<String, dynamic>>();
+                List<Cliente> listaAPI = listaClientes.map<Cliente>((json) {
+                  return Cliente.fromJson(json);
+                }).toList();
+                //Enviando todos os clientes que vieram da API
+                for(Cliente cl in listaAPI){
+                  //enviando cada cliente para o banco de dados
+                  RepositoryServiceCliente.addCliente(cl).then((value){
+                    print("Cliente com o ID $value armazenado!");
+                  });
+                }
+                //sai da funcao
+                salvaDataSync();
+                Navigator.pop(context);
+                _exibeSuccess();
+              }
+            });
+          }
 
         }else{
           print("Erro ao buscar clientes da API");
@@ -417,7 +492,7 @@ class _SincronizarDadosState extends State<SincronizarDados> {
               child: new Text("Finalizar"),
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(context, "/inicio", (r) => false);
               },
             ),
           ],
@@ -457,4 +532,10 @@ class _SincronizarDadosState extends State<SincronizarDados> {
       },
     );
   }
+}
+
+String _convertToBase64(String valor) {
+  Codec<String, String> stringToBase64 = utf8.fuse(base64);
+  String encoded = stringToBase64.encode(valor);
+  return encoded;
 }

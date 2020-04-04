@@ -20,15 +20,12 @@ class RepositoryServicePagamentos{
     return formas;
   }
 
-  static Future<FormaPagamento> getFormaPagamento(int id) async{
+  static Future<FormaPagamento> getFormaPagamento(id) async{
     Database db = await database.database;
-    FormaPagamento fp;
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaPagamentos}
     WHERE ${DatabaseCreator.pagamentoId} == $id''';
     final data = await db.rawQuery(sql);
-    data.map((f){
-      fp = FormaPagamento.fromJson(f);
-    });
+    final fp = FormaPagamento.fromJson(data[0]);
     return fp;
   }
 

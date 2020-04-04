@@ -23,7 +23,7 @@ class RepositoryServiceCliente{
   static Future<Cliente> getCliente(int id) async{
     Database db = await database.database;
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes}
-    WHERE ${DatabaseCreator.id} == $id''';
+    WHERE ${DatabaseCreator.clienteId} == $id''';
     final data = await db.rawQuery(sql);
 
     final pedido = Cliente.fromJson(data[0]);
@@ -33,8 +33,9 @@ class RepositoryServiceCliente{
   static Future <List<Cliente>> buscaCliente(String busca) async {
     Database db = await database.database;
     final sql = '''SELECT * FROM ${DatabaseCreator.tabelaClientes} 
-    WHERE ${DatabaseCreator.clienteNomeRazao} LIKE "%$busca%" OR
-    ${DatabaseCreator.clienteApelido} LIKE "%$busca%" OR
+    WHERE ${DatabaseCreator.clienteNomeRazao} LIKE "%$busca%" OR 
+    ${DatabaseCreator.clienteApelido} LIKE "%$busca%" OR 
+    ${DatabaseCreator.clienteCpf} LIKE "%$busca%" OR 
     ${DatabaseCreator.clienteId} LIKE "%$busca%"''';
     final data = await db.rawQuery(sql);
     List<Cliente> clientes = List();
@@ -52,37 +53,15 @@ class RepositoryServiceCliente{
     return result;
   }
 
-  /*
-
-  static Future<void> deletePedido(Cliente c) async{
+  static Future<int> deleteCliente(Cliente c) async{
     Database db = await database.database;
-    final sql = '''DELETE FROM ${DatabaseCreator.tabelaClientes}
-    WHERE ${DatabaseCreator.codigo} == ${c.codigo}''';
-    final result = await db.rawDelete(sql);
+    final result = await db.delete(DatabaseCreator.tabelaClientes, where: 'id = ?', whereArgs: [c.id]);
+    return result;
   }
-
-  static Future<void> updatePedido(Cliente c) async{
-    Database db = await database.database;
-    final sql = '''UPDATE ${DatabaseCreator.tabelaClientes} SET 
-    ${DatabaseCreator.clienteCPF} = "${c.cep}",
-    ${DatabaseCreator.clienteNome} = "${c.nome}",
-    ${DatabaseCreator.clienteEndereco} = "${c.endereco}",
-    ${DatabaseCreator.clienteBairro} = ${c.bairro},
-    ${DatabaseCreator.clienteCidade} = "${c.cidade}",
-    ${DatabaseCreator.clienteEstado} = "${c.estado}",
-    ${DatabaseCreator.clienteCEP} = "${c.cep}",
-    ${DatabaseCreator.clienteTelefone} = "${c.telefone}",
-    ${DatabaseCreator.clienteEstado} = "${c.estado}",
-    WHERE ${DatabaseCreator.codigo} = ${c.codigo}
-    ''';
-    final result = await db.rawUpdate(sql);
-  }
-  */
 
   static contClientes() async{
     Database db = await database.database;
     final data = await db.rawQuery('''SELECT COUNT(*) FROM ${DatabaseCreator.tabelaClientes}''');
-
     int count = data[0].values.elementAt(0);
     return count;
   }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_status_cliente.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_tipo_cliente.dart';
 import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
@@ -50,90 +52,99 @@ class _ClientesState extends State<Clientes> {
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                child: Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text("Pesquisar Cliente"),
-                          ],
-                        ),
-                        TextFormField(
-                          textCapitalization: TextCapitalization.characters,
-                          controller: _controllerPesquisa,
-                          onChanged: (value) {
-                            salvaTexto(value);
-                          },
-                          keyboardType: TextInputType.text,
-                          style: new TextStyle(
-                              color: Colors.blueAccent, fontSize: 20),
-                          decoration: InputDecoration(
-                              border: new OutlineInputBorder(
-                                borderSide: new BorderSide(),
-                              ),
-                              labelStyle: TextStyle(color: Colors.blueAccent)),
-                        ),
-                        Container(
-                          height: 50.0,
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadastroCliente(),));
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(Icons.person_add),
-                                Text("    "),
-                                Text(
-                                  "Adicionar Cliente",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 20),
-                                ),
-                              ],
-                            ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          children: <Widget>[
+            //Tela do campo de busca e botão
+            Container(
+              decoration: BoxDecoration(),
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Text("Código, Nome ou Apelido"),
+                    TextFormField(
+                      textCapitalization: TextCapitalization.characters,
+                      controller: _controllerPesquisa,
+                      onChanged: (value) {
+                        buscaClientes(value);
+                      },
+                      keyboardType: TextInputType.text,
+                      style:
+                      new TextStyle(color: Colors.blueAccent, fontSize: 20),
+                      decoration: InputDecoration(
+                          border: new OutlineInputBorder(
+                            borderSide: new BorderSide(),
                           ),
-                        ),
-
-                        Divider(
-                          height: 10.0,
-                          color: Colors.transparent,
-                        ),
-                        Table(
-                          columnWidths: {
-                            0: FractionColumnWidth(.2),
-                            1: FractionColumnWidth(.4),
-                            2: FractionColumnWidth(.4)
-                          },
-                          children: [
-                            _criarLinhaTable("Código,Nome,CPF/CNPJ"),
-                          ],
-                        ),
-                        SingleChildScrollView(
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: (MediaQuery.of(context).size.height / 1.8),
-                            child: _criaLista(),
-                          ),
-                        ),
-                      ],
+                          labelStyle: TextStyle(color: Colors.blueAccent)),
                     ),
+                  ],
+                ),
+              ),
+            ),
+
+            Container(
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: FlatButton(
+                  onPressed: (){
+                    //buscando os municipios
+                    RepositoryServiceMunicipios.getAllMunicipos().then((lista){
+                      //buscando a lista de tipos de clientes
+                      RepositoryServiceTipoCliente.getAllTipoCliente().then((listaTipoPessoa){
+                        //buscando a lista de status de clientes
+                        RepositoryServiceClientesStatus.getAllStatusCliente().then((listaStatus){
+                          //enviando o usuário para a tela de cadastro de clientes
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadastroCliente(st: listaStatus, m: lista, tp: listaTipoPessoa,)),);
+                        });
+                      });
+                    });
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.person_add),
+                      Text("Adicionar Cliente", style: TextStyle(fontSize: 20),),
+                    ],
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+
+            //Criando a tabela de amostra
+            Container(
+              child: Padding(
+                padding: EdgeInsets.all(1.0),
+                child: Table(
+                  columnWidths: {
+                    0: FractionColumnWidth(.2),
+                    1: FractionColumnWidth(.4),
+                    2: FractionColumnWidth(.4)
+                  },
+                  children: [
+                    _criarLinhaTable("Código,Nome,CPF/CNPJ"),
+                  ],
+                ),
+              ),
+            ),
+
+            //mostra os produtos disponíves
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(5.0),
+                width: MediaQuery.of(context).size.width,
+                height: (MediaQuery.of(context).size.height / 1),
+                child: _criaLista(),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -224,20 +235,10 @@ class _ClientesState extends State<Clientes> {
           child: GestureDetector(
             onTap: () {
               Municipio m;
-              RepositoryServiceMunicipios.getMunicipio(
-                      clientes[index].idMunicipio)
-                  .then((municipio) {
+              RepositoryServiceMunicipios.getMunicipio(clientes[index].idMunicipio).then((municipio) {
                 m = municipio;
-
+                Navigator.push(context,MaterialPageRoute(builder: (context) => DadosCliente(c: clientes[index],municipio: m,),));
               });
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DadosCliente(
-                      c: clientes[index],
-                      municipio: m,
-                    ),
-                  ));
             },
             child: Column(
               children: <Widget>[
@@ -276,10 +277,6 @@ class _ClientesState extends State<Clientes> {
   }
 
   void _initBuscaClientes() {
-    //String j = '{"codigo": 1903,"cpf": "00.000.000/0001-00","nome": "Emerson Ribeiro Dos Santos","endereco": "Av. Rui Barbosa, 375 Sala 301 - A","bairro": "Casa Amarela","cidade": "Salgueiro","estado": "Pernambuco","cep": "56000-000","telefone": "(87)3031-000","celular": "(81)99535-2990"}';
-    //Cliente c = Cliente.fromJson(json.decode(j));
-    //RepositoryServiceCliente.addCliente(c);
-
     final Future<Database> dbFuture = database.initDatabase();
     dbFuture.then((data) {
       Future<List<Cliente>> clientesFuture =
@@ -292,4 +289,43 @@ class _ClientesState extends State<Clientes> {
       });
     });
   }
+  void _exibePermissaoSinc() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Image.asset('lib/assets/alerta.png', width: 50, height: 50,),
+                  Divider( height: 20.0, color: Colors.transparent,),
+                  Text("Você precisa sincronizar os dados antes de cadastrar um novo cliente!", style: TextStyle(fontSize: 25.0),),
+                ],
+              )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Sincronizar"),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(context, "/sincronismo", (r) => false);
+              },
+            ),
+            new FlatButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
+

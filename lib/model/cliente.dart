@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final cliente = clienteFromJson(jsonString);
-
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -12,18 +8,19 @@ class Cliente {
     final String nomeRazao;
     final String apelidoFantasia;
     final String rgInsc;
-    final dynamic inscMunicipal;
-    final dynamic fone1;
+    final String inscMunicipal;
+    final String fone1;
     final String fone2;
-    final dynamic fone3;
+    final String fone3;
     final String cep;
     final String endereco;
-    final dynamic enderecoNumero;
-    final dynamic complemento;
+    final String enderecoNumero;
+    final String complemento;
     final String bairro;
     final int idMunicipio;
     final int idStatus;
     final int idClienteTipo;
+    final String email;
     final int limiteCredito;
     final double totalPendente;
     final double limiteDisponivel;
@@ -47,6 +44,7 @@ class Cliente {
         @required this.idMunicipio,
         @required this.idStatus,
         @required this.idClienteTipo,
+        @required this.email,
         @required this.limiteCredito,
         @required this.totalPendente,
         @required this.limiteDisponivel,
@@ -59,18 +57,19 @@ class Cliente {
         String nomeRazao,
         String apelidoFantasia,
         String rgInsc,
-        dynamic inscMunicipal,
-        dynamic fone1,
+        String inscMunicipal,
+        String fone1,
         String fone2,
-        dynamic fone3,
+        String fone3,
         String cep,
         String endereco,
-        dynamic enderecoNumero,
-        dynamic complemento,
+        String enderecoNumero,
+        String complemento,
         String bairro,
         int idMunicipio,
         int idStatus,
         int idClienteTipo,
+        String email,
         int limiteCredito,
         double totalPendente,
         double limiteDisponivel,
@@ -94,6 +93,7 @@ class Cliente {
             idMunicipio: idMunicipio ?? this.idMunicipio,
             idStatus: idStatus ?? this.idStatus,
             idClienteTipo: idClienteTipo ?? this.idClienteTipo,
+            email: email ?? this.email,
             limiteCredito: limiteCredito ?? this.limiteCredito,
             totalPendente: totalPendente ?? this.totalPendente,
             limiteDisponivel: limiteDisponivel ?? this.limiteDisponivel,
@@ -110,18 +110,19 @@ class Cliente {
         nomeRazao: json["nome_razao"] == null ? null : json["nome_razao"],
         apelidoFantasia: json["apelido_fantasia"] == null ? null : json["apelido_fantasia"],
         rgInsc: json["rg_insc"] == null ? null : json["rg_insc"],
-        inscMunicipal: json["insc_municipal"],
-        fone1: json["fone1"],
+        inscMunicipal: json["insc_municipal"] == null ? null : json["insc_municipal"],
+        fone1: json["fone1"] == null ? null : json["fone1"],
         fone2: json["fone2"] == null ? null : json["fone2"],
-        fone3: json["fone3"],
+        fone3: json["fone3"] == null ? null : json["fone3"],
         cep: json["cep"] == null ? null : json["cep"],
         endereco: json["endereco"] == null ? null : json["endereco"],
-        enderecoNumero: json["endereco_numero"],
-        complemento: json["complemento"],
+        enderecoNumero: json["endereco_numero"] == null ? null : json["endereco_numero"],
+        complemento: json["complemento"] == null ? null : json["complemento"],
         bairro: json["bairro"] == null ? null : json["bairro"],
         idMunicipio: json["id_municipio"] == null ? null : json["id_municipio"],
         idStatus: json["id_status"] == null ? null : json["id_status"],
         idClienteTipo: json["id_cliente_tipo"] == null ? null : json["id_cliente_tipo"],
+        email: json["email"] == null ? null : json["email"],
         limiteCredito: json["limite_credito"] == null ? null : json["limite_credito"],
         totalPendente: json["total_pendente"] == null ? null : json["total_pendente"].toDouble(),
         limiteDisponivel: json["limite_disponivel"] == null ? null : json["limite_disponivel"].toDouble(),
@@ -134,23 +135,23 @@ class Cliente {
         "nome_razao": nomeRazao == null ? null : nomeRazao,
         "apelido_fantasia": apelidoFantasia == null ? null : apelidoFantasia,
         "rg_insc": rgInsc == null ? null : rgInsc,
-        "insc_municipal": inscMunicipal,
-        "fone1": fone1,
+        "insc_municipal": inscMunicipal == null ? null : inscMunicipal,
+        "fone1": fone1 == null ? null : fone1,
         "fone2": fone2 == null ? null : fone2,
-        "fone3": fone3,
+        "fone3": fone3 == null ? null : fone3,
         "cep": cep == null ? null : cep,
         "endereco": endereco == null ? null : endereco,
-        "endereco_numero": enderecoNumero,
-        "complemento": complemento,
+        "endereco_numero": enderecoNumero == null ? null : enderecoNumero,
+        "complemento": complemento == null ? null : complemento,
         "bairro": bairro == null ? null : bairro,
         "id_municipio": idMunicipio == null ? null : idMunicipio,
         "id_status": idStatus == null ? null : idStatus,
         "id_cliente_tipo": idClienteTipo == null ? null : idClienteTipo,
+        "email": email == null ? null : email,
         "limite_credito": limiteCredito == null ? null : limiteCredito,
         "total_pendente": totalPendente == null ? null : totalPendente,
         "limite_disponivel": limiteDisponivel == null ? null : limiteDisponivel,
     };
-
     factory Cliente.fromMap(Map<String, dynamic> json) => Cliente(
         id: json["id"] == null ? null : json["id"],
         tpPessoa: json["tp_pessoa"] == null ? null : json["tp_pessoa"],
@@ -158,18 +159,19 @@ class Cliente {
         nomeRazao: json["nome_razao"] == null ? null : json["nome_razao"],
         apelidoFantasia: json["apelido_fantasia"] == null ? null : json["apelido_fantasia"],
         rgInsc: json["rg_insc"] == null ? null : json["rg_insc"],
-        inscMunicipal: json["insc_municipal"],
-        fone1: json["fone1"],
+        inscMunicipal: json["insc_municipal"] == null ? null : json["insc_municipal"],
+        fone1: json["fone1"] == null ? null : json["fone1"],
         fone2: json["fone2"] == null ? null : json["fone2"],
-        fone3: json["fone3"],
+        fone3: json["fone3"] == null ? null : json["fone3"],
         cep: json["cep"] == null ? null : json["cep"],
         endereco: json["endereco"] == null ? null : json["endereco"],
-        enderecoNumero: json["endereco_numero"],
-        complemento: json["complemento"],
+        enderecoNumero: json["endereco_numero"] == null ? null : json["endereco_numero"],
+        complemento: json["complemento"] == null ? null : json["complemento"],
         bairro: json["bairro"] == null ? null : json["bairro"],
         idMunicipio: json["id_municipio"] == null ? null : json["id_municipio"],
         idStatus: json["id_status"] == null ? null : json["id_status"],
         idClienteTipo: json["id_cliente_tipo"] == null ? null : json["id_cliente_tipo"],
+        email: json["email"] == null ? null : json["email"],
         limiteCredito: json["limite_credito"] == null ? null : json["limite_credito"],
         totalPendente: json["total_pendente"] == null ? null : json["total_pendente"].toDouble(),
         limiteDisponivel: json["limite_disponivel"] == null ? null : json["limite_disponivel"].toDouble(),
@@ -182,18 +184,19 @@ class Cliente {
         "nome_razao": nomeRazao == null ? null : nomeRazao,
         "apelido_fantasia": apelidoFantasia == null ? null : apelidoFantasia,
         "rg_insc": rgInsc == null ? null : rgInsc,
-        "insc_municipal": inscMunicipal,
-        "fone1": fone1,
+        "insc_municipal": inscMunicipal == null ? null : inscMunicipal,
+        "fone1": fone1 == null ? null : fone1,
         "fone2": fone2 == null ? null : fone2,
-        "fone3": fone3,
+        "fone3": fone3 == null ? null : fone3,
         "cep": cep == null ? null : cep,
         "endereco": endereco == null ? null : endereco,
-        "endereco_numero": enderecoNumero,
-        "complemento": complemento,
+        "endereco_numero": enderecoNumero == null ? null : enderecoNumero,
+        "complemento": complemento == null ? null : complemento,
         "bairro": bairro == null ? null : bairro,
         "id_municipio": idMunicipio == null ? null : idMunicipio,
         "id_status": idStatus == null ? null : idStatus,
         "id_cliente_tipo": idClienteTipo == null ? null : idClienteTipo,
+        "email": email == null ? null : email,
         "limite_credito": limiteCredito == null ? null : limiteCredito,
         "total_pendente": totalPendente == null ? null : totalPendente,
         "limite_disponivel": limiteDisponivel == null ? null : limiteDisponivel,

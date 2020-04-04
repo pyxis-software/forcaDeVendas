@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/controller/creator_database.dart';
-import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
-import 'package:forca_de_vendas/model/produto.dart';
-import 'package:forca_de_vendas/view/dados_produto.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
+import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqlite_api.dart';
 
-class TelaProdutos extends StatefulWidget {
+class TelaSelecionaClienteVenda extends StatefulWidget {
   @override
-  _TelaProdutosState createState() => _TelaProdutosState();
+  _TelaSelecionaClienteVendaState createState() =>
+      _TelaSelecionaClienteVendaState();
 }
 
-class _TelaProdutosState extends State<TelaProdutos> {
-  //Minhas alterações'
+class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVenda> {
   final Color blue = Color(0xFF3C5A99);
+  List<Cliente> clientes;
   final _controllerPesquisa = TextEditingController();
-  String host;
-  ProgressDialog load;
-  int cont = 0;
-  List<Produto> produtos;
-  DatabaseCreator database = DatabaseCreator();
+  int cont;
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+    cont = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    //Inicialização do processo
-    if (produtos == null) {
-      produtos = List<Produto>();
-      _getProdutos();
+    if (clientes == null) {
+      clientes = List<Cliente>();
+      _initBuscaClientes();
     }
-
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("Produtos"),
         backgroundColor: blue,
+        title: Text("Incluir Cliente no Pedido"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -54,12 +48,12 @@ class _TelaProdutosState extends State<TelaProdutos> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text("Código, Descrição ou Referência"),
+                    Text("Código, Nome ou Apelido"),
                     TextFormField(
                       textCapitalization: TextCapitalization.characters,
                       controller: _controllerPesquisa,
                       onChanged: (value) {
-                        _buscaproduto(value);
+                        buscaClientes(value);
                       },
                       keyboardType: TextInputType.text,
                       style:
@@ -82,13 +76,11 @@ class _TelaProdutosState extends State<TelaProdutos> {
                 child: Table(
                   columnWidths: {
                     0: FractionColumnWidth(.2),
-                    1: FractionColumnWidth(.3),
-                    2: FractionColumnWidth(.1),
-                    3: FractionColumnWidth(.2),
-                    4: FractionColumnWidth(.2)
+                    1: FractionColumnWidth(.4),
+                    2: FractionColumnWidth(.4)
                   },
                   children: [
-                    _criarLinhaTable("Código,Descrição,Un,Preço,Estoque"),
+                    _criarLinhaTable("Código,Nome,CPF/CNPJ"),
                   ],
                 ),
               ),
@@ -109,49 +101,17 @@ class _TelaProdutosState extends State<TelaProdutos> {
     );
   }
 
-  //Buscando o Host da API
-  void buscaHost() async {
-    final pref = await SharedPreferences.getInstance();
-    String h = pref.getString('host');
-    String id = pref.getString('id_vend');
-    if (h != null && id != null) {
+  void buscaClientes(String value) {}
+
+  void _initBuscaClientes() {
+    RepositoryServiceCliente.getAllClientes().then((lista) {
       setState(() {
-        host = h;
-      });
-    }
-  }
-
-  //Buscando os produtos via API
-  _getProdutos() async {
-    final Future<Database> dbFuture = database.initDatabase();
-    dbFuture.then((data) {
-      Future<List<Produto>> produtoFuture =
-          RepositoryServiceProdutos.getAllProdutos();
-      produtoFuture.then((lista) {
-        setState(() {
-          produtos = lista;
-          cont = lista.length;
-        });
+        clientes = lista;
+        cont = lista.length;
       });
     });
   }
 
-  //Buscando os produtos
-  _buscaproduto(value) async {
-    final Future<Database> dbFuture = database.initDatabase();
-    dbFuture.then((data) {
-      Future<List<Produto>> produtoFuture =
-          RepositoryServiceProdutos.buscaProdutos(value);
-      produtoFuture.then((lista) {
-        setState(() {
-          produtos = lista;
-          cont = lista.length;
-        });
-      });
-    });
-  }
-
-  //Cria a lista dos produtos
   _criaLista() {
     return ListView.builder(
       shrinkWrap: true,
@@ -160,53 +120,31 @@ class _TelaProdutosState extends State<TelaProdutos> {
         return Container(
           child: GestureDetector(
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DadosProduto(
-                      produto: produtos[index],
-                    ),
-                  ));
+              _confirmClienteSelecionado(clientes[index]);
             },
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(1.0),
+                  padding: EdgeInsets.all(10.0),
                   child: Table(
                     columnWidths: {
                       0: FractionColumnWidth(.2),
-                      1: FractionColumnWidth(.3),
-                      2: FractionColumnWidth(.1),
-                      3: FractionColumnWidth(.2),
-                      4: FractionColumnWidth(.2)
+                      1: FractionColumnWidth(.4),
+                      2: FractionColumnWidth(.4)
                     },
                     children: [
                       TableRow(children: [
                         Text(
-                          "${produtos[index].idProduto}",
+                          "${clientes[index].id}",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          "${produtos[index].produtoDescricao}",
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "UN",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "${produtos[index].pvenda}",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "${produtos[index].saldoGeral}",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        Text("${clientes[index].nomeRazao}",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text("${clientes[index].cpfCnpj}",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                       ]),
                     ],
                   ),
@@ -220,14 +158,42 @@ class _TelaProdutosState extends State<TelaProdutos> {
     );
   }
 
-  //Cria a tabela de rotulos
+  _confirmClienteSelecionado(Cliente cliente){
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text("Deseja confirmar o cliente?", style: TextStyle(fontSize: 25.0),),
+                  Divider( height: 20.0, color: Colors.transparent,),
+                  Text("Cliente: ${cliente.nomeRazao}"),
+                ],
+              )
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Confirmar"),
+              onPressed: () {
+                _selecionaCliente(cliente);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   _criarLinhaTable(String listaNomes) {
     return TableRow(
       children: listaNomes.split(',').map((name) {
         return Container(
           decoration: BoxDecoration(
             color: Colors.grey,
-            backgroundBlendMode: BlendMode.difference,
           ),
           alignment: Alignment.center,
           child: Text(
@@ -238,5 +204,12 @@ class _TelaProdutosState extends State<TelaProdutos> {
         );
       }).toList(),
     );
+  }
+
+  void _selecionaCliente(Cliente cliente) async {
+    final pref = await SharedPreferences.getInstance();
+    pref.setInt("id_cliente_venda", cliente.id);
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 }

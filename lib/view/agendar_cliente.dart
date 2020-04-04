@@ -14,12 +14,14 @@ class AgendarCliente extends StatefulWidget {
 
 class _AgendarClienteState extends State<AgendarCliente> {
   DateTime value = DateTime.now();
+  final Color blue = Color(0xFF3C5A99);
   int motivo = 1;
   @override
   Widget build(BuildContext context) {
     final format = DateFormat("dd/MM/yyyy");
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: blue,
         title: Text("Agendar Visita"),
       ),
       body: SingleChildScrollView(
