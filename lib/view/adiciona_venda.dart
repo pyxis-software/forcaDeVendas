@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
@@ -15,7 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TelaAdicionaVenda extends StatefulWidget {
   final List<FormaPagamento> pagamentos;
   final int vendaId;
-  const TelaAdicionaVenda({Key key, this.pagamentos, this.vendaId}) : super(key: key);
+  const TelaAdicionaVenda({Key key, this.pagamentos, this.vendaId})
+      : super(key: key);
   @override
   _TelaAdicionaVendaState createState() => _TelaAdicionaVendaState();
 }
@@ -46,13 +46,19 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
   //total com desconto
   double totalBruto;
 
+  //Visualização de alerta
+  bool isVisualizado;
+
   //Input do valor de desconto
   final inputDesconto = TextEditingController();
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    isVisualizado = false;
     clienteSelected = false;
     contItens = 0;
     idCliente = 0;
@@ -63,7 +69,45 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     totalVendas = 0;
     totalBruto = 0;
     vendaId = widget.vendaId;
+    RepositoryServiceVendas.alteraFormaPagamento(formaPagamento.id, vendaId);
     _initVerificacaoDados();
+  }
+
+  Future<bool> _onBackPressed() {
+    return showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              content: Container(
+                  child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    "Deseja mesmo cancelar o pedido?",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              )),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text("Cancelar Pedido"),
+                  onPressed: () {
+                    RepositoryServiceVendas.removeVenda(vendaId);
+                    Navigator.pop(context);
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  Future<bool> _onBack() {
+    false;
   }
 
   @override
@@ -78,231 +122,237 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     if (itens == null) {
       itens = List<Iten>();
     }
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      appBar: AppBar(
-        title: Text("Novo Pedido"),
-        backgroundColor: blue,
-      ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Padding(
-          padding: EdgeInsets.all(5.0),
-          child: Column(
-            children: <Widget>[
-              //Nome do cliente
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  _telaNomeCliente(),
-                  Container(
-                    color: amarelo,
-                    padding: EdgeInsets.all(10.0),
-                    width: (MediaQuery.of(context).size.width / 6),
-                    child: FlatButton(
-                      child: Icon(
-                        Icons.person_add,
-                        color: Colors.black,
+    return WillPopScope(
+      onWillPop: (idCliente == 0) ? _onBackPressed : _onBack(),
+      child: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+          title: Text("Novo Pedido"),
+          backgroundColor: blue,
+        ),
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Padding(
+            padding: EdgeInsets.all(5.0),
+            child: Column(
+              children: <Widget>[
+                //Nome do cliente
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    _telaNomeCliente(),
+                    Container(
+                      color: amarelo,
+                      padding: EdgeInsets.all(10.0),
+                      width: (MediaQuery.of(context).size.width / 6),
+                      child: FlatButton(
+                        child: Icon(
+                          Icons.person_add,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TelaSelecionaClienteVenda(),
+                              ));
+                        },
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TelaSelecionaClienteVenda(),
-                            ));
-                      },
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
 
-              //Lista de itens
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Ítens do Pedido",
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              _criaListaItens(),
-              Expanded(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(5.0),
-                  color: amarelo,
-                  child: ListView(
-                    children: <Widget>[
-                      Text(
-                        "Formas de Pagamento",
-                        textDirection: TextDirection.ltr,
-                        style:
-                            TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                      ),
+                //Lista de itens
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Ítens do Pedido",
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
+                _criaListaItens(),
+                Expanded(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.all(5.0),
+                    color: amarelo,
+                    child: ListView(
+                      children: <Widget>[
+                        Text(
+                          "Formas de Pagamento",
+                          textDirection: TextDirection.ltr,
+                          style: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
 
-                      Container(
-                        decoration: BoxDecoration(border: Border.all()),
-                        child: DropdownButton(
-                          isExpanded: true,
-                          hint: Text(
-                            "Selecione",
-                            style: TextStyle(fontSize: 25.0),
+                        Container(
+                          decoration: BoxDecoration(border: Border.all()),
+                          child: DropdownButton(
+                            isExpanded: true,
+                            hint: Text(
+                              "Selecione",
+                              style: TextStyle(fontSize: 25.0),
+                            ),
+                            value: formaPagamento,
+                            items: formasPagamento.map((FormaPagamento fp) {
+                              return DropdownMenuItem<FormaPagamento>(
+                                value: fp,
+                                child: Text(
+                                  fp.descricao,
+                                  style: TextStyle(fontSize: 18.0),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (fp) {
+                              setState(() {
+                                formaPagamento = fp;
+                              });
+                              //altera a forma de pagamento da venda
+                              RepositoryServiceVendas.alteraFormaPagamento(
+                                  formaPagamento.id, vendaId);
+                            },
                           ),
-                          value: formaPagamento,
-                          items: formasPagamento.map((FormaPagamento fp) {
-                            return DropdownMenuItem<FormaPagamento>(
-                              value: fp,
-                              child: Text(
-                                fp.descricao,
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (fp) {
-                            setState(() {
-                              formaPagamento = fp;
-                            });
-                            //altera a forma de pagamento da venda
-                            RepositoryServiceVendas.alteraFormaPagamento(formaPagamento.id, vendaId);
-                          },
                         ),
-                      ),
 
-                      //Total dos itens
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(border: Border.all()),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Valor dos Produtos"),
-                            Text(
-                              "R\$ ${totalVendas.toStringAsPrecision(4)}",
-                              style: TextStyle(
-                                  fontSize: 19.0, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      //Descontos
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(border: Border.all()),
-
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Tipo de Desconto",
-                              textDirection: TextDirection.ltr,
-                              style:
-                              TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                            ),
-                            DropdownButton(
-                              isExpanded: true,
-                              hint: Text(
-                                "Selecione",
-                                style: TextStyle(fontSize: 17.0),
-                              ),
-                              value: tipoDesconto,
-                              items: [
-                                DropdownMenuItem(
-                                  value: -1,
-                                  child: Text(
-                                    "SELECIONE",
-                                    style: TextStyle(fontSize: 17.0),
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: 0,
-                                  child: Text(
-                                    "PORCENTAGEM${(desconto == 0)? "" : " - $desconto %"}",
-                                    style: TextStyle(fontSize: 17.0),
-                                  ),
-                                ),
-                                DropdownMenuItem(
-                                  value: 1,
-                                  child: Text(
-                                    "VALOR${(desconto == 0)? "" : " - R\$ $desconto"}",
-                                    style: TextStyle(fontSize: 17.0),
-                                  ),
-                                ),
-                              ],
-                              onChanged: (tp) {
-                                if(tp != -1){
-                                  setState(() {
-                                    tipoDesconto = tp;
-                                  });
-                                  _exibeInputDesconto();
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      //Total Bruto
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(5.0),
-                        decoration: BoxDecoration(border: Border.all()),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Valor Total"),
-                            Text(
-                              "R\$ ${totalBruto.toStringAsPrecision(4)}",
-                              style: TextStyle(
-                                  fontSize: 19.0, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      //Adicionar Item
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 60,
-                        child: GestureDetector(
-                          child: Row(
+                        //Total dos itens
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(border: Border.all()),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Icon(Icons.add),
+                              Text("Valor dos Produtos"),
                               Text(
-                                "Adicionar Item",
+                                "R\$ ${totalVendas.toStringAsPrecision(4)}",
                                 style: TextStyle(
-                                    fontSize: 19.0, fontWeight: FontWeight.bold),
+                                    fontSize: 19.0,
+                                    fontWeight: FontWeight.bold),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
-                          onTap: (){
-                            RepositoryServiceProdutos.getAllProdutos()
-                                .then((data) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TelaSelecionaItem(
-                                      produtos: data,
-                                      idVenda: vendaId,
-                                    ),
-                                  ));
-                            });
-                          },
                         ),
-                      ),
 
-                    ],
+                        //Descontos
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(border: Border.all()),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "Tipo de Desconto",
+                                textDirection: TextDirection.ltr,
+                                style: TextStyle(
+                                    fontSize: 17, fontWeight: FontWeight.bold),
+                              ),
+                              DropdownButton(
+                                isExpanded: true,
+                                hint: Text(
+                                  "Selecione",
+                                  style: TextStyle(fontSize: 17.0),
+                                ),
+                                value: tipoDesconto,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: -1,
+                                    child: Text(
+                                      "SELECIONE",
+                                      style: TextStyle(fontSize: 17.0),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 0,
+                                    child: Text(
+                                      "PORCENTAGEM${(desconto == 0) ? "" : " - $desconto %"}",
+                                      style: TextStyle(fontSize: 17.0),
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 1,
+                                    child: Text(
+                                      "VALOR${(desconto == 0) ? "" : " - R\$ $desconto"}",
+                                      style: TextStyle(fontSize: 17.0),
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (tp) {
+                                  if (tp != -1) {
+                                    setState(() {
+                                      tipoDesconto = tp;
+                                    });
+                                    _exibeInputDesconto();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        //Total Bruto
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.all(5.0),
+                          decoration: BoxDecoration(border: Border.all()),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Valor Total"),
+                              Text(
+                                "R\$ ${totalBruto.toStringAsPrecision(4)}",
+                                style: TextStyle(
+                                    fontSize: 19.0,
+                                    fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        //Adicionar Item
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 60,
+                          child: GestureDetector(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.add),
+                                Text(
+                                  "Adicionar Item",
+                                  style: TextStyle(
+                                      fontSize: 19.0,
+                                      fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              RepositoryServiceProdutos.getAllProdutos()
+                                  .then((data) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TelaSelecionaItem(
+                                        produtos: data,
+                                        idVenda: vendaId,
+                                      ),
+                                    ));
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -369,12 +419,12 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
   }
 
   //Buscando os itens do pedido
-  _getIItensPedido(){
+  _getIItensPedido() {
     print("Buscando os itens");
-    RepositoryServiceVendas.getItensVenda(vendaId).then((lista){
+    RepositoryServiceVendas.getItensVenda(vendaId).then((lista) {
       //salvando o valor total
       double soma = 0.0;
-      for (Iten i in lista){
+      for (Iten i in lista) {
         final totalProduto = (i.pvenda * i.qtdVenda);
         soma += totalProduto;
       }
@@ -447,8 +497,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                           height: 10,
                         ),
                         //Nome do cliente
-                        Text(
-                            itens[index].produtoDescricao,
+                        Text(itens[index].produtoDescricao,
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
 
@@ -523,13 +572,16 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     } else {
       if (id_cliente != 0) {
         //tem cliente
+        idCliente = id_cliente;
         //adiciona o cliente a venda
         //busca os dados do cliente
         RepositoryServiceCliente.getCliente(id_cliente).then((data) {
           //buscando a cidade do cliente
-          RepositoryServiceMunicipios.getMunicipio(data.idMunicipio).then((municipio){
+          RepositoryServiceMunicipios.getMunicipio(data.idMunicipio)
+              .then((municipio) {
             //adiciona o cliente na venda
-            RepositoryServiceVendas.addCliente(data, vendaId, municipio).then((update){
+            RepositoryServiceVendas.addCliente(data, vendaId, municipio)
+                .then((update) {
               print("Cliente adicionado");
               pref.setInt("id_cliente_venda", 0);
               setState(() {
@@ -551,17 +603,17 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
       //calculando os descontos
       //verifica se o desconto é em porcentagem
       double des = 0;
-      if(tipoDesconto == 0){
+      if (tipoDesconto == 0) {
         des = (totalVendas * desconto) / 100;
         setState(() {
-          totalBruto =  totalVendas - des;
+          totalBruto = totalVendas - des;
         });
-      }else if(tipoDesconto == 1){
+      } else if (tipoDesconto == 1) {
         des = desconto.toDouble();
         setState(() {
           totalBruto = totalVendas - desconto;
         });
-      }else{
+      } else {
         print("Desconto não foi selecionado");
         setState(() {
           totalBruto = totalVendas;
@@ -569,15 +621,16 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
       }
 
       //atualiza o valor no bando de dados
-      RepositoryServiceVendas.alteraValorVenda(totalVendas, totalBruto, des, vendaId).then((result){
+      RepositoryServiceVendas.alteraValorVenda(
+              totalVendas, totalBruto, des, vendaId)
+          .then((result) {
         print("Valor da venda alterado!");
       });
-
     });
   }
 
   //Exibe o input do valor do desconto
-  _exibeInputDesconto(){
+  _exibeInputDesconto() {
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -586,24 +639,29 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
         return AlertDialog(
           content: Container(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text("Informe ${(tipoDesconto == 0)? "a porcentagem": "o valor"} do desconto", style: TextStyle(fontSize: 18),),
-                  Divider( height: 20.0, color: Colors.transparent,),
-                  TextFormField(
-                    controller: inputDesconto,
-                    keyboardType: TextInputType.number,
-                    onChanged: (text){},
-                  ),
-                ],
-              )
-          ),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                "Informe ${(tipoDesconto == 0) ? "a porcentagem" : "o valor"} do desconto",
+                style: TextStyle(fontSize: 18),
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              TextFormField(
+                controller: inputDesconto,
+                keyboardType: TextInputType.number,
+                onChanged: (text) {},
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Salvar"),
               onPressed: () {
                 setState(() {
-                  desconto = int.parse( inputDesconto.text);
+                  desconto = int.parse(inputDesconto.text);
                 });
                 Navigator.pop(context);
               },
@@ -614,7 +672,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     );
   }
 
-  _showConfirmDeleteItenPedido(Iten iten){
+  _showConfirmDeleteItenPedido(Iten iten) {
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -623,15 +681,23 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
         return AlertDialog(
           content: Container(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text("Atenção!", style: TextStyle(fontSize: 20),),
-                  Divider( height: 20.0, color: Colors.transparent,),
-                  Text("Excluir ítem do pedido?", style: TextStyle(fontSize: 18),),
-                ],
-              )
-          ),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Atenção!",
+                style: TextStyle(fontSize: 20),
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Excluir ítem do pedido?",
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Confirmar"),
@@ -651,4 +717,48 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
       },
     );
   }
+
+  void _exibeMensagem() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Atenção!",
+                style: TextStyle(fontSize: 20),
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Deseja Cancelar o pedido?",
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          )),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancelar Pedido"),
+              onPressed: () {
+                //
+                RepositoryServiceVendas.removeVenda(vendaId);
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void initPlatformState() {}
 }

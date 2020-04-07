@@ -135,10 +135,18 @@ class RepositoryServiceVendas{
 
 
   //Removendo a venda
-  static Future<void> removeVenda(Venda venda) async{
+  static Future<void> removeVenda(id) async{
     Database db = await database.database;
-    final sql = '''DELETE FROM ${DatabaseCreator.tabelaVenda} WHERE ${DatabaseCreator.vendasId} == ${venda.id}''';
+    final sql = '''DELETE FROM ${DatabaseCreator.tabelaVenda} WHERE ${DatabaseCreator.vendasId} == $id''';
     db.rawDelete(sql);
+  }
+
+
+  //Altera o status da venda
+  static Future<void> alteraStatus (Venda venda) async{
+    Database db = await database.database;
+    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET pedido_status = 2 WHERE ${DatabaseCreator.vendasId} == ${venda.id}''';
+    db.rawUpdate(sql);
   }
 
 

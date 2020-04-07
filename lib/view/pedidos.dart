@@ -8,6 +8,7 @@ import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/model/venda.dart';
 import 'package:forca_de_vendas/view/adiciona_venda.dart';
 import 'package:forca_de_vendas/view/edita_venda.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -183,7 +184,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
 
             //Lista de Pedidos
             Expanded(
-              child: _criaLista(),
+              child: (selected)? _criaListaEmAberto() : _criaListaFaturado(),
             ),
           ],
         ),
@@ -224,7 +225,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
     }
   }
 
-  _criaLista() {
+  _criaListaEmAberto() {
     return ListView.builder(
       itemCount: cont,
       itemBuilder: (context, index) {
@@ -346,10 +347,83 @@ class _TelaPedidosState extends State<TelaPedidos> {
     );
   }
 
-  Cliente _getDadosCliente(id) {
-    RepositoryServiceCliente.getCliente(id).then((cliente) {
-      return cliente;
-    });
+  _criaListaFaturado() {
+    return ListView.builder(
+      itemCount: cont,
+      itemBuilder: (context, index) {
+        print(vendas[index].nomeRazao);
+        return Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                //Container das informações do cliente e do pedido
+                Container(
+                  padding: EdgeInsets.all(5.0),
+                  width: (MediaQuery.of(context).size.width / 1.1),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "${vendas[index].id}",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "${(vendas[index].clienteCidade == "") ? "Sem Cidade" : vendas[index].clienteCidade}",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      //Nome do cliente
+                      Text(
+                          (vendas[index].nomeRazao == "")
+                              ? "Cliente não selecionado ainda"
+                              : vendas[index].nomeRazao,
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+                      //data e valor
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            vendas[index].dataVenda,
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "R\$ ${vendas[index].totLiquido.toStringAsPrecision(4)}",
+                            style: TextStyle(
+                                color: Colors.redAccent, fontSize: 17),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   _getDadosUsuario() async {
@@ -403,11 +477,11 @@ class _TelaPedidosState extends State<TelaPedidos> {
     );
   }
 
-  void _removeVenda(venda) {
+  void _removeVenda(Venda venda) {
     //removenda a venda completa
     RepositoryServiceVendas.removeItens(venda).then((response){
       //excluindo a venda
-      RepositoryServiceVendas.removeVenda(venda).then((responseVenda){
+      RepositoryServiceVendas.removeVenda(venda.id).then((responseVenda){
         _buscaVendas();
         Navigator.pop(context);
       });

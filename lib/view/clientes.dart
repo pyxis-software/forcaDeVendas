@@ -9,6 +9,7 @@ import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/view/cadastro_cliente.dart';
 import 'package:forca_de_vendas/view/dados_cliente.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -96,14 +97,18 @@ class _ClientesState extends State<Clientes> {
                   onPressed: (){
                     //buscando os municipios
                     RepositoryServiceMunicipios.getAllMunicipos().then((lista){
-                      //buscando a lista de tipos de clientes
-                      RepositoryServiceTipoCliente.getAllTipoCliente().then((listaTipoPessoa){
-                        //buscando a lista de status de clientes
-                        RepositoryServiceClientesStatus.getAllStatusCliente().then((listaStatus){
-                          //enviando o usuário para a tela de cadastro de clientes
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadastroCliente(st: listaStatus, m: lista, tp: listaTipoPessoa,)),);
+                      if(lista.length == 0){
+                        _exibePermissaoSinc();
+                      }else{
+                        //buscando a lista de tipos de clientes
+                        RepositoryServiceTipoCliente.getAllTipoCliente().then((listaTipoPessoa){
+                          //buscando a lista de status de clientes
+                          RepositoryServiceClientesStatus.getAllStatusCliente().then((listaStatus){
+                            //enviando o usuário para a tela de cadastro de clientes
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaCadastroCliente(st: listaStatus, m: lista, tp: listaTipoPessoa,)),);
+                          });
                         });
-                      });
+                      }
                     });
                   },
                   child: Row(
@@ -312,7 +317,7 @@ class _ClientesState extends State<Clientes> {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
-                Navigator.pushNamedAndRemoveUntil(context, "/sincronismo", (r) => false);
+                Navigator.push(context,MaterialPageRoute(builder: (context) => SincronizarDados(),));
               },
             ),
             new FlatButton(

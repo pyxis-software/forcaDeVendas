@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/functions.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
+import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
+import 'package:forca_de_vendas/model/venda.dart';
 import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -205,7 +208,7 @@ class _SincronizarDadosState extends State<SincronizarDados> {
             setState(() {
               percent += 0.1;
             });
-            /*LISTA DE FORMAS DE PAGAMENTO*/
+            /*LISTA DE CLIENTES*/
             var respostaTiposCliente = await http.get(
               "http://$host:5005/forcavendas/getclientestipos",
               headers: {HttpHeaders.authorizationHeader: "Basic $token"},
@@ -378,10 +381,8 @@ class _SincronizarDadosState extends State<SincronizarDados> {
                     print("Cliente com o ID $value armazenado!");
                   });
                 }
-                //sai da funcao
-                salvaDataSync();
-                Navigator.pop(context);
-                _exibeSuccess();
+                //salvando as vendas
+                _salvaVendas();
               }
             });
           }
@@ -531,6 +532,91 @@ class _SincronizarDadosState extends State<SincronizarDados> {
         );
       },
     );
+  }
+
+  void _salvaVendas() {
+    //buscando todas as vendas que não foram faturadas ainda
+    RepositoryServiceVendas.getVendasEmAberto().then((listaVendas){
+      if(listaVendas.length > 0){
+        //existe vendas a serem sincronizadas
+
+        bool isErro = false;
+        //Percorrendo a lista de vendas
+
+
+        for (Venda venda in listaVendas) {
+
+          //buscando os itens da venda
+          RepositoryServiceVendas.getItensVenda(venda.id).then((listaItens){
+            //criando o json da venda
+            String listaString = "";
+            int item = 1;
+            for(Iten iten in listaItens){
+              Map<String, dynamic> jsonIten() =>
+                  {
+                    "item" : item,
+                    "id_produto": iten.idProduto,
+                    "complemento": "",
+                    "vlr_vendido": iten.pvenda,
+                    "qtde": iten.qtdVenda,
+                    "tot_bruto": (iten.qtdVenda * iten.pvenda),
+                    "vlr_desc_prc": 0,
+                    "vlr_desc_vlr": 0,
+                    "vlr_liquido": (iten.qtdVenda * iten.pvenda),
+                    "grade": iten.grade,
+                    "id_vendedor": venda.idVendedor,
+                  };
+              listaString = listaString +  jsonIten().toString();
+              item += 1;
+            }
+            Map<String, dynamic> jsonDados() =>
+                {
+                  "data_venda": venda.dataVenda,
+                  "id_empresa": venda.idEmpresa,
+                  "id_cliente": venda.idCliente,
+                  "id_vendedor": venda.idVendedor,
+                  "id_fpagto": venda.idFpagto,
+                  "id_usuario": venda.idUsuario,
+                  "tot_bruto": venda.totBruto,
+                  "tot_desc_prc": venda.totDescPrc,
+                  "tot_desc_vlr": venda.totDescVlr,
+                  "tot_liquido": venda.totLiquido,
+                  "itens": json.encode(listaString)
+                };
+
+            print(json.encode(jsonDados()));
+
+            //enviando os dados para a API
+            String dados = _convertToBase64(json.encode(jsonDados()));
+            var responseAPIPostVenda = http.get(
+              "http://$host:5005/forcavendas/postpedidos?objson=$dados",
+              headers: {
+                HttpHeaders.authorizationHeader: "Basic $token"
+              },
+            ).then((response){
+              if(response.statusCode == 200){
+                if(!response.body.contains("MESSAGE")){
+                  isErro = true;
+                  Navigator.pop(context);
+                  _errorAlert("4");
+                }else{
+                  RepositoryServiceVendas.alteraStatus(venda);
+                }
+              }
+            });
+          });
+        }
+
+        if(!isErro){
+          Navigator.pop(context);
+          _exibeSuccess();
+        }
+
+      }else{
+        Navigator.pop(context);
+        _exibeSuccess();
+      }
+    });
   }
 }
 
