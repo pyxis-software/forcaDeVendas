@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:forca_de_vendas/view/TelaInicial.dart';
-import 'package:forca_de_vendas/view/TelaLogin.dart';
-import 'package:forca_de_vendas/view/TelaSplash.dart';
-import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
-import 'package:forca_de_vendas/view/sincronizar_dados.dart';
+import 'package:forca_de_vendas/view/configracao_page.dart';
+import 'package:forca_de_vendas/view/login_page.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados_page.dart';
+import 'package:forca_de_vendas/view/splash_page.dart';
+import 'package:forca_de_vendas/view/tela_home.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => TelaLogin(),
         '/sincronismo': (context) => SincronizarDados(),
         '/configuracao': (context) => TelaConfiguracao(),
-        '/inicio': (context) => TelaInicial(),
+        '/inicio': (context) => TelaHome(),
       },
     );
   }

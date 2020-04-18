@@ -7,20 +7,18 @@ import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_pagamentos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_status_cliente.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_tipo_cliente.dart';
-import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
-import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/clientes_status.dart';
 import 'package:forca_de_vendas/model/financeiro.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/model/produto.dart';
 import 'package:forca_de_vendas/model/tipo_cliente.dart';
-import 'package:forca_de_vendas/view/TelaInicial.dart';
-import 'package:forca_de_vendas/view/Telaconfiguracao.dart';
-import 'package:forca_de_vendas/view/clientes.dart';
-import 'package:forca_de_vendas/view/financeiro.dart';
-import 'package:forca_de_vendas/view/produtos.dart';
-import 'package:forca_de_vendas/view/sincronizar_dados.dart';
+import 'package:forca_de_vendas/view/clientes_page.dart';
+import 'package:forca_de_vendas/view/configracao_page.dart';
+import 'package:forca_de_vendas/view/financeiro_page.dart';
+import 'package:forca_de_vendas/view/produtos_page.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados_page.dart';
+import 'package:forca_de_vendas/view/tela_home.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -79,7 +77,7 @@ getDrawer(context) {
           subtitle: Text("Meus Relatórios..."),
           trailing: Icon(Icons.arrow_forward),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaInicial()),);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaHome()),);
           }
         ),
         ListTile(
