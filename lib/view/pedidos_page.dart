@@ -1,14 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/controller/repositorio_service_pagamentos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/model/venda.dart';
+import 'package:forca_de_vendas/view/edita_pedido_page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'adiciona_venda_page.dart';
-import 'edita_venda_page.dart';
 
 class TelaPedidos extends StatefulWidget {
   @override
@@ -304,22 +303,9 @@ class _TelaPedidosState extends State<TelaPedidos> {
                         ),
                         onPressed: () {
                           //editando o pedido
-                          RepositoryServicePagamentos.getAllFormasPagamentos()
-                              .then((data) {
-                            RepositoryServicePagamentos.getFormaPagamento(
-                                    vendas[index].idFpagto)
-                                .then((forma) {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TelaEditaVenda(
-                                      pagamentos: data,
-                                      fp: forma,
-                                      venda: vendas[index],
-                                    ),
-                                  ));
-                            });
-                          });
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => TelaEdita(venda: vendas[index],)));
                         },
                       ),
                       SizedBox(

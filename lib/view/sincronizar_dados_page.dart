@@ -602,15 +602,14 @@ class _SincronizarDadosState extends State<SincronizarDados> {
                   _errorAlert("4");
                 }else{
                   RepositoryServiceVendas.alteraStatus(venda);
+                  if(!isErro){
+                    Navigator.pop(context);
+                    _exibeSuccess();
+                  }
                 }
               }
             });
           });
-        }
-
-        if(!isErro){
-          Navigator.pop(context);
-          _exibeSuccess();
         }
 
       }else{

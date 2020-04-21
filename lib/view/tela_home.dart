@@ -54,7 +54,7 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                       SizedBox(
                         width: 150,
-                        child: Image.asset("lib/assets/logo.png"),
+                        child: Image.asset("lib/assets/logo_trp.png"),
                       ),
                       SizedBox(
                         height: 50,

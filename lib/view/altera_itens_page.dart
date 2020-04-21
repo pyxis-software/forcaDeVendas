@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
@@ -7,16 +7,15 @@ import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/view/seelciona_cliente_venda_page.dart';
 import 'package:forca_de_vendas/view/seleciona_item_pedido_page.dart';
 
-class TelaAdicionaVenda extends StatefulWidget {
+class AlteraItensPedido extends StatefulWidget {
   final int vendaId;
 
-  const TelaAdicionaVenda({this.vendaId, Key key}) : super(key: key);
-
+  const AlteraItensPedido({Key key, this.vendaId}) : super(key: key);
   @override
-  _TelaAdicionaVendaState createState() => _TelaAdicionaVendaState();
+  _AlteraItensPedidoState createState() => _AlteraItensPedidoState();
 }
 
-class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
+class _AlteraItensPedidoState extends State<AlteraItensPedido> {
   final Color blue = Color(0xFF3C5A99);
   final Color amarelo = Color.fromARGB(210, 234, 188, 53);
   Timer t;
@@ -39,43 +38,6 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     _initVerificacaoDados();
   }
 
-  Future<bool> _onBackPressed() {
-    return showDialog(
-          barrierDismissible: true,
-          context: context,
-          builder: (BuildContext context) {
-            // return object of type Dialog
-            return AlertDialog(
-              content: Container(
-                  child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    "Deseja mesmo cancelar o pedido?",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              )),
-              actions: <Widget>[
-                new FlatButton(
-                  child: new Text("Cancelar Pedido"),
-                  onPressed: () {
-                    RepositoryServiceVendas.removeVenda(vendaId);
-                    Navigator.pop(context);
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
-  }
-
-  Future<bool> _onBack() {
-    false;
-  }
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -85,128 +47,89 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: (contItens == 0) ? _onBackPressed : _onBack(),
-      child: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          title: Text("Novo Pedido"),
-          backgroundColor: blue,
-        ),
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        title: Text("Editar Itens do Pedido"),
         backgroundColor: blue,
-        body: Container(
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: MediaQuery.of(context).size.height * 0.80,
-                child: Container(
-                  color: blue,
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Text(
-                        (contItens != 0)
-                            ? "Total: R\$ ${soma.toStringAsPrecision(4)}"
-                            : "Adicione os Itens primeiro!",
-                        style: TextStyle(fontSize: 25, color: Colors.white),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.top,
-                      ),
-                      _criaListaItens(),
-                    ],
-                  ),
+      ),
+      backgroundColor: blue,
+      body: Container(
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.85,
+              child: Container(
+                color: blue,
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      (contItens != 0)
+                          ? "Total: R\$ ${soma.toStringAsPrecision(4)}"
+                          : "Adicione os Itens primeiro!",
+                      style: TextStyle(fontSize: 25, color: Colors.white),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    _criaListaItens(),
+                  ],
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: MediaQuery.of(context).size.height * 0.20,
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  color: blue,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          //buscando a lista de produtos disponíveis
-                          RepositoryServiceProdutos.getAllProdutos()
-                              .then((lista) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TelaSelecionaItem(
-                                          produtos: lista,
-                                          idVenda: vendaId,
-                                        )));
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          width: MediaQuery.of(context).size.width,
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              "Adicionar Item",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
-                            ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: Container(
+                padding: EdgeInsets.all(10),
+                color: blue,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        //buscando a lista de produtos disponíveis
+                        RepositoryServiceProdutos.getAllProdutos()
+                            .then((lista) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => TelaSelecionaItem(
+                                    produtos: lista,
+                                    idVenda: vendaId,
+                                  )));
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        height: 70,
+                        child: Center(
+                          child: Text(
+                            "Adicionar Item",
+                            style:
+                            TextStyle(fontSize: 25, color: Colors.white),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Visibility(
-                        visible: (contItens != 0) ? true : false,
-                        child: Stack(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            TelaSelecionaClienteVenda(
-                                              idVenda: vendaId,
-                                            )));
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                width: MediaQuery.of(context).size.width,
-                                height: 60,
-                                child: Center(
-                                  child: Text(
-                                    "Adicionar Cliente",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -222,11 +145,18 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
         final totalProduto = (i.pvenda * i.qtdVenda);
         s += totalProduto;
       }
-      setState(() {
-        contItens = lista.length;
-        itens = lista;
-        soma = s;
+      //alterando o valor no banco de dados
+      RepositoryServiceVendas.getVenda(vendaId).then((v){
+        RepositoryServiceVendas.alteraValorVenda(soma, (v.totBruto - v.totDescVlr), v.totDescVlr, vendaId).then((returno){
+          setState(() {
+            contItens = lista.length;
+            itens = lista;
+            soma = s;
+          });
+        });
       });
+
+
     });
   }
 
@@ -244,7 +174,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
       );
     } else {
       return Container(
-        height: MediaQuery.of(context).size.height * 0.60,
+        height: MediaQuery.of(context).size.height * 0.70,
         child: ListView.builder(
           physics: BouncingScrollPhysics(),
           itemCount: contItens,
@@ -384,23 +314,23 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
         return AlertDialog(
           content: Container(
               child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "Atenção!",
-                style: TextStyle(fontSize: 20),
-              ),
-              Divider(
-                height: 20.0,
-                color: Colors.transparent,
-              ),
-              Text(
-                "Excluir ítem do pedido?",
-                style: TextStyle(fontSize: 18),
-              ),
-            ],
-          )),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Atenção!",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Divider(
+                    height: 20.0,
+                    color: Colors.transparent,
+                  ),
+                  Text(
+                    "Excluir ítem do pedido?",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Confirmar"),

@@ -41,6 +41,17 @@ class RepositoryServiceVendas{
     return vendas;
   }
 
+  //busc uma venda
+  static Future<Venda> getVenda(id) async{
+    Database db = await database.database;
+    final sql = '''SELECT * FROM ${DatabaseCreator.tabelaVenda}
+    WHERE ${DatabaseCreator.vendasId} == $id
+    ''';
+    final data = await db.rawQuery(sql);
+    final venda = Venda.fromJson(data[0]);
+    return venda;
+  }
+
   //Adiciona uma venda
   static Future<int> addVenda(Venda venda) async{
     Database db = await database.database;
@@ -66,6 +77,7 @@ class RepositoryServiceVendas{
   //altera a forma de pagamento da venda
   static Future<void> alteraFormaPagamento (forma, id) async{
     Database db = await database.database;
+    print(forma);
     final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET id_fpagto = $forma WHERE ${DatabaseCreator.vendasId} == $id''';
     db.rawUpdate(sql);
   }

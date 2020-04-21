@@ -6,6 +6,7 @@ import 'package:forca_de_vendas/controller/repository_service_cliente.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/iten.dart';
+import 'package:forca_de_vendas/view/lista_itens_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TelaInformacaoVenda extends StatefulWidget {
@@ -40,6 +41,9 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
 
   //forma de pagamento selecionada
   FormaPagamento FpSelecionada;
+
+  //Lista dos itens
+  List<Iten> itens;
 
   //Controller do campo de desconto
   final controllerDesconto = TextEditingController();
@@ -185,10 +189,21 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
                                     child: Container(
                                       height: 60,
                                       alignment: Alignment.center,
-                                      child: Text(
-                                        "Ver Itens",
-                                        style:
-                                            TextStyle(fontSize: 17, color: blue),
+                                      child: GestureDetector(
+                                        onTap: (){
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TelaItensPedido(
+                                                        itens: itens,
+                                                      )));
+                                        },
+                                        child: Text(
+                                          "Ver Itens",
+                                          style:
+                                              TextStyle(fontSize: 17, color: blue),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -363,6 +378,7 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
       setState(() {
         totalItens = lista.length;
         valorItens = soma;
+        itens = lista;
       });
     });
   }
