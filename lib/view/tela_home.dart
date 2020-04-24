@@ -5,6 +5,7 @@ import 'package:forca_de_vendas/view/clientes_page.dart';
 import 'package:forca_de_vendas/view/pedidos_page.dart';
 import 'package:forca_de_vendas/view/produtos_page.dart';
 import 'package:forca_de_vendas/view/sincronizar_dados_page.dart';
+import 'package:forca_de_vendas/view/teste.dart';
 import 'package:forca_de_vendas/widgets/button_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,8 +60,17 @@ class _TelaHomeState extends State<TelaHome> {
                       SizedBox(
                         height: 50,
                       ),
-                      Text( (usuario != null)? usuario.colaboradorNome : "", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),),
-                      Text( (usuario != null)? usuario.empresaFantasia : "", style: TextStyle(fontSize: 16, color: Colors.white),),
+                      Text(
+                        (usuario != null) ? usuario.colaboradorNome : "",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.white),
+                      ),
+                      Text(
+                        (usuario != null) ? usuario.empresaFantasia : "",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                       SizedBox(
                         height: 30,
                       ),
@@ -68,7 +78,9 @@ class _TelaHomeState extends State<TelaHome> {
                         padding: EdgeInsets.all(20),
                         child: Column(
                           children: <Widget>[
-                            Divider(color: Colors.white,),
+                            Divider(
+                              color: Colors.white,
+                            ),
                             Container(
                               height: 50,
                               alignment: Alignment.centerLeft,
@@ -81,12 +93,18 @@ class _TelaHomeState extends State<TelaHome> {
                               child: SizedBox.expand(
                                 child: FlatButton(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Icon(Icons.people, size: 30, color: Colors.white,),
+                                            Icon(
+                                              Icons.people,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
                                             Text("  "),
                                             Text(
                                               "Clientes",
@@ -98,16 +116,20 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                           ],
                                         ),
-                                        Icon((!menuClienteVisible) ? Icons.keyboard_arrow_down :Icons.keyboard_arrow_up, color: Colors.white,),
-
+                                        Icon(
+                                          (!menuClienteVisible)
+                                              ? Icons.keyboard_arrow_down
+                                              : Icons.keyboard_arrow_up,
+                                          color: Colors.white,
+                                        ),
                                       ],
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        menuClienteVisible = !menuClienteVisible;
+                                        menuClienteVisible =
+                                            !menuClienteVisible;
                                       });
-                                    }
-                                ),
+                                    }),
                               ),
                             ),
                             Visibility(
@@ -116,15 +138,38 @@ class _TelaHomeState extends State<TelaHome> {
                                 padding: EdgeInsets.only(left: 20, right: 20),
                                 child: Column(
                                   children: <Widget>[
-                                    ButtonMenu(icone: Icon(Icons.people, color: Colors.white, size: 20,), nome: "Lista de Clientes", pageRoute: MaterialPageRoute(builder: (context) => Clientes()), tipo: 0,),
-                                    ButtonMenu(icone: Icon(Icons.person_add, color: Colors.white, size: 20,), nome: "Cadastrar Cliente", pageRoute: MaterialPageRoute(builder: (context) => TelaCadastroCliente()), tipo: 1,),
+                                    ButtonMenu(
+                                      icone: Icon(
+                                        Icons.people,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      nome: "Lista de Clientes",
+                                      pageRoute: MaterialPageRoute(
+                                          builder: (context) => Clientes()),
+                                      tipo: 0,
+                                    ),
+                                    ButtonMenu(
+                                      icone: Icon(
+                                        Icons.person_add,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      nome: "Cadastrar Cliente",
+                                      pageRoute: MaterialPageRoute(
+                                          builder: (context) =>
+                                              TelaCadastroCliente()),
+                                      tipo: 1,
+                                    ),
                                     //ButtonMenu(icone: Icon(Icons.calendar_today, color: Colors.white, size: 20,), nome: "Agendar Cliente", pageRoute: MaterialPageRoute(builder: (context) => TelaCadastroCliente()),),
                                     //Divider(color: Colors.white,),
                                   ],
                                 ),
                               ),
                             ),
-                            Divider(color: Colors.white,),
+                            Divider(
+                              color: Colors.white,
+                            ),
                             Container(
                               height: 50,
                               alignment: Alignment.centerLeft,
@@ -137,12 +182,18 @@ class _TelaHomeState extends State<TelaHome> {
                               child: SizedBox.expand(
                                 child: FlatButton(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Icon(Icons.shopping_cart, size: 30, color: Colors.white,),
+                                            Icon(
+                                              Icons.shopping_cart,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
                                             Text("  "),
                                             Text(
                                               "Pedidos",
@@ -154,16 +205,25 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                           ],
                                         ),
-                                        Icon(Icons.arrow_forward_ios, color: Colors.white,),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: Colors.white,
+                                        ),
                                       ],
                                     ),
                                     onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => TelaPedidos()),);
-                                    }
-                                ),
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TelaPedidos()),
+                                      );
+                                    }),
                               ),
                             ),
-                            Divider(color: Colors.white,),
+                            Divider(
+                              color: Colors.white,
+                            ),
                             Container(
                               height: 50,
                               alignment: Alignment.centerLeft,
@@ -176,12 +236,18 @@ class _TelaHomeState extends State<TelaHome> {
                               child: SizedBox.expand(
                                 child: FlatButton(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Icon(Icons.local_offer, size: 30, color: Colors.white,),
+                                            Icon(
+                                              Icons.local_offer,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
                                             Text("  "),
                                             Text(
                                               "Produtos",
@@ -193,16 +259,25 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                           ],
                                         ),
-                                        Icon(Icons.arrow_forward_ios, color: Colors.white,),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: Colors.white,
+                                        ),
                                       ],
                                     ),
                                     onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => TelaProdutos()),);
-                                    }
-                                ),
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TelaProdutos()),
+                                      );
+                                    }),
                               ),
                             ),
-                            Divider(color: Colors.white,),
+                            Divider(
+                              color: Colors.white,
+                            ),
                             Container(
                               height: 50,
                               alignment: Alignment.centerLeft,
@@ -215,12 +290,18 @@ class _TelaHomeState extends State<TelaHome> {
                               child: SizedBox.expand(
                                 child: FlatButton(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Icon(Icons.insert_drive_file, size: 30, color: Colors.white,),
+                                            Icon(
+                                              Icons.insert_drive_file,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
                                             Text("  "),
                                             Text(
                                               "Relatórios",
@@ -232,14 +313,18 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                           ],
                                         ),
-                                        Icon(Icons.arrow_forward_ios, color: Colors.white,),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: Colors.white,
+                                        ),
                                       ],
                                     ),
-                                    onPressed: () {}
-                                ),
+                                    onPressed: () {}),
                               ),
                             ),
-                            Divider(color: Colors.white,),
+                            Divider(
+                              color: Colors.white,
+                            ),
                             Container(
                               height: 50,
                               alignment: Alignment.centerLeft,
@@ -252,12 +337,18 @@ class _TelaHomeState extends State<TelaHome> {
                               child: SizedBox.expand(
                                 child: FlatButton(
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Icon(Icons.sync, size: 30, color: Colors.white,),
+                                            Icon(
+                                              Icons.sync,
+                                              size: 30,
+                                              color: Colors.white,
+                                            ),
                                             Text("  "),
                                             Text(
                                               "Sincronizar",
@@ -269,28 +360,43 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                           ],
                                         ),
-                                        Icon(Icons.arrow_forward_ios, color: Colors.white,),
+                                        Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: Colors.white,
+                                        ),
                                       ],
                                     ),
                                     onPressed: () {
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => SincronizarDados()),);
-                                    }
-                                ),
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SincronizarDados()),
+                                      );
+                                    }),
                               ),
                             ),
-                            Divider(color: Colors.white,),
-                            SizedBox(height: 40,),
+
+                            Divider(
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              height: 40,
+                            ),
                             GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 _showDialog();
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.white)
-                                ),
+                                    border: Border.all(color: Colors.white)),
                                 height: 60,
                                 child: Center(
-                                  child: Text("Sair do APP", style: TextStyle(fontSize: 18, color: Colors.white),),
+                                  child: Text(
+                                    "Sair do APP",
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.white),
+                                  ),
                                 ),
                               ),
                             ),
@@ -311,16 +417,14 @@ class _TelaHomeState extends State<TelaHome> {
     );
   }
 
-
   //busca as informações do usuário
-  _getInfoUser() async{
+  _getInfoUser() async {
     final pref = await SharedPreferences.getInstance();
     final data = pref.getString('usuario');
     if (data != null) {
       setState(() {
         usuario = Usuario.fromJson(data);
       });
-
     } else {
       return Navigator.push(
         context,

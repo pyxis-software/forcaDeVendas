@@ -24,6 +24,8 @@ class DatabaseCreator {
   static const vendaStatus = "pedido_status";
   static const vendaNFiscal = "pedido_nfiscal";
   static const vendaNFiscalEmissao = "pedido_nfiscal_emissao";
+  static const vendaLat = "lat";
+  static const vendaLng = "lng";
 
   //Tabela Clientes
   static const tabelaClientes = "clientes";
@@ -143,6 +145,8 @@ class DatabaseCreator {
       $vendaStatus INTEGER,
       $vendaNFiscal INTEGER,
       $vendaNFiscalEmissao TEXT,
+      $vendaLat TEXT,
+      $vendaLng TEXT,
       UNIQUE($vendasId)
     )''';
 

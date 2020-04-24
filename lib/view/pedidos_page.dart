@@ -474,7 +474,9 @@ class _TelaPedidosState extends State<TelaPedidos> {
               "tot_desc_vlr": 0.0,
               "tot_liquido": 0.0,
               "pedido_nfiscal": "",
-              "pedido_nfiscal_emissao": ""
+              "pedido_nfiscal_emissao": "",
+              "lat": "",
+              "lng": ""
             };
         //criando a venda
         Venda venda = Venda.fromMap(v());

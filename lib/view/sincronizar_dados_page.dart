@@ -582,13 +582,16 @@ class _SincronizarDadosState extends State<SincronizarDados> {
                   "tot_desc_prc": venda.totDescPrc,
                   "tot_desc_vlr": venda.totDescVlr,
                   "tot_liquido": venda.totLiquido,
-                  "itens": json.encode(listaString)
+                  "itens": json.encode(listaString),
+                  "lat": venda.lat,
+                  "lng": venda.lng
                 };
 
             print(json.encode(jsonDados()));
 
             //enviando os dados para a API
             String dados = _convertToBase64(json.encode(jsonDados()));
+            print(dados);
             var responseAPIPostVenda = http.get(
               "http://$host:5005/forcavendas/postpedidos?objson=$dados",
               headers: {

@@ -275,10 +275,10 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   _errorAlert(codigo) {
     String message;
     switch(codigo){
-      case 1:
+      case 2:
         message = "Verifique o Host Informado!";
         break;
-      case 2:
+      case 1:
         message = "ID não encontrado!";
         break;
       default:

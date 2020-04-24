@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/iten.dart';
@@ -71,6 +70,13 @@ class RepositoryServiceVendas{
   static Future<void> alteraValorVenda (total_bruto, total_liquido, total_desconto, id) async{
     Database db = await database.database;
     final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET tot_bruto = $total_bruto, tot_desc_vlr = $total_desconto, tot_liquido = $total_liquido WHERE ${DatabaseCreator.vendasId} == $id''';
+    db.rawUpdate(sql);
+  }
+
+  //altera a localização da venda
+  static Future<void> alteraLocalizacao (lat, lng, id) async{
+    Database db = await database.database;
+    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET lat = $lat, lng = $lng WHERE ${DatabaseCreator.vendasId} == $id''';
     db.rawUpdate(sql);
   }
 

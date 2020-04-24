@@ -7,8 +7,10 @@ import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/view/lista_itens_page.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 class TelaInformacaoVenda extends StatefulWidget {
   final int idVenda;
@@ -23,6 +25,9 @@ class TelaInformacaoVenda extends StatefulWidget {
 class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   //cor padrao do aplicativo
   final Color blue = Color(0xFF3C5A99);
+
+  //Mensagem de alerta
+  String mensagemAlerta;
 
   //id da venda
   int idVenda;
@@ -52,8 +57,12 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   double valorDesconto;
   double totalDesconto;
 
+  //Posição do usuário ao salvar a venda
+  Position positionUser;
+
   //formato de valores
-  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+  final formatoValores =
+      new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   @override
   void initState() {
@@ -68,6 +77,7 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
     FpSelecionada = formasPagamento[0];
     tipoDesconto = 0;
     desconto = 0;
+    mensagemAlerta = "";
     _iniBuscaClientePedido();
     _initBuscaInfoItens();
   }
@@ -310,13 +320,15 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
                 ],
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Container(
               child: Padding(
                 padding: EdgeInsets.all(10),
                 child: GestureDetector(
                   onTap: () {
-                    _actionSalvaPedido();
+                    _getLocationUser();
                   },
                   child: Container(
                     height: MediaQuery.of(context).size.height * 0.10,
@@ -467,7 +479,7 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
                     CircularProgressIndicator(),
                     Text("  "),
                     Text(
-                      "Salvando...",
+                      mensagemAlerta,
                       style: TextStyle(fontSize: 25.0),
                     ),
                   ],
@@ -480,24 +492,120 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
     );
   }
 
+  //Exibe erro do GPS
+  //Loading
+  _exibeErroGPS(codigo) {
+    String message;
+    switch (codigo) {
+      case 1:
+        message = "Sem permissão de GPS!";
+        break;
+      case 2:
+        message = "GPS Desativado!";
+        break;
+    }
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Image.asset(
+                      'lib/assets/alerta.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                    Divider(
+                      height: 20.0,
+                      color: Colors.transparent,
+                    ),
+                    Text(
+                      message,
+                      style: TextStyle(fontSize: 25.0),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   //Ação de salvar o pedido
   _actionSalvaPedido() {
-    _exibeLoading();
-    //salvando o tipo de pagamento
-    RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda)
-        .then((resultFp) {
-      //salvando o cliente do pedido
-      RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m) {
-        RepositoryServiceVendas.addCliente(cliente, idVenda, m)
-            .then((responseAddCliente) {
-          //alterando o valor da venda
-          RepositoryServiceVendas.alteraValorVenda(
-                  valorItens, valorDesconto, totalDesconto, idVenda)
-              .then((result) {
-            Navigator.pushNamedAndRemoveUntil(context, "/inicio", (r) => false);
+    if (desconto == 0) {
+      print("Selecione o desconto");
+      Navigator.pop(context);
+      Toast.show("Selecione o desconto", context, duration: 3, gravity: Toast.BOTTOM);
+    } else {
+      setState(() {
+        mensagemAlerta = "Salvando...";
+      });
+      //salvando o tipo de pagamento
+      RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda)
+          .then((resultFp) {
+        //salvando o cliente do pedido
+        RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m) {
+          RepositoryServiceVendas.addCliente(cliente, idVenda, m)
+              .then((responseAddCliente) {
+            //alterando o valor da venda
+            RepositoryServiceVendas.alteraValorVenda(
+                    valorItens, valorDesconto, totalDesconto, idVenda)
+                .then((result) {
+              RepositoryServiceVendas.alteraLocalizacao(
+                      positionUser.latitude, positionUser.longitude, idVenda)
+                  .then((res) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, "/inicio", (r) => false);
+              });
+            });
           });
         });
       });
+    }
+  }
+
+  _getLocationUser() async {
+    setState(() {
+      mensagemAlerta = "Salvando...";
+    });
+    _exibeLoading();
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    geolocator.checkGeolocationPermissionStatus().then((status) {
+      if (status == GeolocationStatus.granted) {
+        setState(() {
+          mensagemAlerta = "Aguardando GPS";
+        });
+      }
+    });
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      setState(() {
+        positionUser = position;
+        _actionSalvaPedido();
+      });
+    }).catchError((e) {
+      print(e);
     });
   }
 }
