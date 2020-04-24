@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/creator_database.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/model/produto.dart';
+import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -23,6 +24,9 @@ class _TelaProdutosState extends State<TelaProdutos> {
   List<Produto> produtos;
   DatabaseCreator database = DatabaseCreator();
 
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +41,7 @@ class _TelaProdutosState extends State<TelaProdutos> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text("Produtos"),
         backgroundColor: blue,
@@ -75,27 +80,6 @@ class _TelaProdutosState extends State<TelaProdutos> {
                 ),
               ),
             ),
-
-            //Criando a tabela de amostra
-            /*
-            Container(
-              child: Padding(
-                padding: EdgeInsets.all(1.0),
-                child: Table(
-                  columnWidths: {
-                    0: FractionColumnWidth(.2),
-                    1: FractionColumnWidth(.3),
-                    2: FractionColumnWidth(.1),
-                    3: FractionColumnWidth(.2),
-                    4: FractionColumnWidth(.2)
-                  },
-                  children: [
-                    _criarLinhaTable("Código,Descrição,Un,Preço,Estoque"),
-                  ],
-                ),
-              ),
-            ),
-             */
 
             //mostra os produtos disponíves
             Expanded(
@@ -192,7 +176,7 @@ class _TelaProdutosState extends State<TelaProdutos> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            child: Text("R\$ ${produtos[index].pvenda.toStringAsPrecision(4)}", style: TextStyle(fontSize: 19, color: blue, fontWeight: FontWeight.bold),),
+                            child: Text("${formatoValores.format(produtos[index].pvenda)}", style: TextStyle(fontSize: 19, color: blue, fontWeight: FontWeight.bold),),
                           ),
                           Container(
                             child: Text("${produtos[index].produtoUnidade}"),

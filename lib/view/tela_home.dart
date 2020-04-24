@@ -54,7 +54,7 @@ class _TelaHomeState extends State<TelaHome> {
                       ),
                       SizedBox(
                         width: 150,
-                        child: Image.asset("lib/assets/logo_trp.png"),
+                        child: Image.asset("lib/assets/logo.png"),
                       ),
                       SizedBox(
                         height: 50,
@@ -116,11 +116,8 @@ class _TelaHomeState extends State<TelaHome> {
                                 padding: EdgeInsets.only(left: 20, right: 20),
                                 child: Column(
                                   children: <Widget>[
-                                    Divider(color: Colors.white,),
                                     ButtonMenu(icone: Icon(Icons.people, color: Colors.white, size: 20,), nome: "Lista de Clientes", pageRoute: MaterialPageRoute(builder: (context) => Clientes()), tipo: 0,),
-                                    Divider(color: Colors.white,),
                                     ButtonMenu(icone: Icon(Icons.person_add, color: Colors.white, size: 20,), nome: "Cadastrar Cliente", pageRoute: MaterialPageRoute(builder: (context) => TelaCadastroCliente()), tipo: 1,),
-                                    Divider(color: Colors.white,),
                                     //ButtonMenu(icone: Icon(Icons.calendar_today, color: Colors.white, size: 20,), nome: "Agendar Cliente", pageRoute: MaterialPageRoute(builder: (context) => TelaCadastroCliente()),),
                                     //Divider(color: Colors.white,),
                                   ],
@@ -296,6 +293,9 @@ class _TelaHomeState extends State<TelaHome> {
                                   child: Text("Sair do APP", style: TextStyle(fontSize: 18, color: Colors.white),),
                                 ),
                               ),
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).padding.bottom,
                             ),
                           ],
                         ),

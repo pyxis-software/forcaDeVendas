@@ -6,6 +6,7 @@ import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/view/seelciona_cliente_venda_page.dart';
 import 'package:forca_de_vendas/view/seleciona_item_pedido_page.dart';
+import 'package:intl/intl.dart';
 
 class TelaAdicionaVenda extends StatefulWidget {
   final int vendaId;
@@ -20,6 +21,9 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
   final Color blue = Color(0xFF3C5A99);
   final Color amarelo = Color.fromARGB(210, 234, 188, 53);
   Timer t;
+
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   //Lista de itens do pedido
   List<Iten> itens;
@@ -62,7 +66,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                   onPressed: () {
                     RepositoryServiceVendas.removeVenda(vendaId);
                     Navigator.pop(context);
-                    Navigator.of(context).pop(true);
+                    Navigator.pop(context);
                   },
                 ),
               ],
@@ -88,7 +92,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
     return WillPopScope(
       onWillPop: (contItens == 0) ? _onBackPressed : _onBack(),
       child: Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomPadding: true,
         appBar: AppBar(
           title: Text("Novo Pedido"),
           backgroundColor: blue,
@@ -101,22 +105,19 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: MediaQuery.of(context).size.height * 0.80,
+                height: MediaQuery.of(context).size.height * 0.79,
                 child: Container(
                   color: blue,
                   child: Column(
                     children: <Widget>[
                       SizedBox(
-                        height: 30,
+                        height: 20,
                       ),
                       Text(
                         (contItens != 0)
-                            ? "Total: R\$ ${soma.toStringAsPrecision(4)}"
+                            ? "Total: ${ formatoValores.format(soma)}"
                             : "Adicione os Itens primeiro!",
                         style: TextStyle(fontSize: 25, color: Colors.white),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).padding.top,
                       ),
                       _criaListaItens(),
                     ],
@@ -124,13 +125,12 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                 ),
               ),
               Positioned(
-                bottom: 0,
+                bottom: MediaQuery.of(context).padding.bottom,
                 left: 0,
                 right: 0,
-                height: MediaQuery.of(context).size.height * 0.20,
+                height: MediaQuery.of(context).size.height * 0.18,
                 child: Container(
                   padding: EdgeInsets.all(10),
-                  color: blue,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -141,12 +141,14 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                           RepositoryServiceProdutos.getAllProdutos()
                               .then((lista) {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TelaSelecionaItem(
-                                          produtos: lista,
-                                          idVenda: vendaId,
-                                        )));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TelaSelecionaItem(
+                                  produtos: lista,
+                                  idVenda: vendaId,
+                                ),
+                              ),
+                            );
                           });
                         },
                         child: Container(
@@ -188,7 +190,7 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 width: MediaQuery.of(context).size.width,
-                                height: 60,
+                                height: 50,
                                 child: Center(
                                   child: Text(
                                     "Adicionar Cliente",
@@ -325,12 +327,12 @@ class _TelaAdicionaVendaState extends State<TelaAdicionaVenda> {
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "R\$ ${itens[index].pvenda.toStringAsPrecision(4)}",
+                                "${formatoValores.format(itens[index].pvenda)}",
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "R\$ ${(itens[index].pvenda * itens[index].qtdVenda).toStringAsPrecision(4)}",
+                                "${formatoValores.format((itens[index].pvenda * itens[index].qtdVenda))}",
                                 style: TextStyle(
                                     color: Colors.redAccent, fontSize: 20),
                               ),

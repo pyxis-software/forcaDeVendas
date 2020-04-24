@@ -17,6 +17,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   final _controllerId = TextEditingController();
   ProgressDialog load;
   String erro;
+  String token = "YWRtaW46YWRtaW4=";
 
   @override
   void initState() {
@@ -169,27 +170,35 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
     try {
       var response = await http.get(
         '$url',
-        headers: {HttpHeaders.authorizationHeader: "Basic YWRtaW46YWRtaW4="},
+        headers: {HttpHeaders.authorizationHeader: "Basic $token"},
       );
       print(response.statusCode.toString());
       if (response.statusCode == 200) {
-        //Recebendo os dados do usuário e armazenando
-        final List data = json.decode(response.body);
-        final usuario = json.encode(data[0]);
 
-        //Armazenando o JSON com as informações do usuário
-        final pref = await SharedPreferences.getInstance();
-        pref.setString('usuario', usuario);
-        //Exibe alerta de tudo certo
-        Navigator.pop(context);
-        _exibeSuccess();
+        //verifica se existe o usuário
+        if(!response.body.toString().contains("MESSAGE")){
+          //Recebendo os dados do usuário e armazenando
+          final List data = json.decode(response.body);
+          final usuario = json.encode(data[0]);
+
+          //Armazenando o JSON com as informações do usuário
+          final pref = await SharedPreferences.getInstance();
+          pref.setString('usuario', usuario);
+          //Exibe alerta de tudo certo
+          Navigator.pop(context);
+          _exibeSuccess();
+        }else{
+          Navigator.pop(context);
+          _errorAlert(1);
+        }
+        
       } else {
         Navigator.pop(context);
-        _errorAlert("1");
+        _errorAlert(2);
       }
     } catch (e) {
       Navigator.pop(context);
-      _errorAlert("1");
+      _errorAlert(3);
     }
   }
 
@@ -263,7 +272,18 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
   }
 
   //Erro Sincronização
-  _errorAlert(String codigo) {
+  _errorAlert(codigo) {
+    String message;
+    switch(codigo){
+      case 1:
+        message = "Verifique o Host Informado!";
+        break;
+      case 2:
+        message = "ID não encontrado!";
+        break;
+      default:
+        message = "Verifique sua internet!";
+    }
     showDialog(
       barrierDismissible: true,
       context: context,
@@ -288,7 +308,7 @@ class _TelaConfiguracaoState extends State<TelaConfiguracao> {
                 style: TextStyle(fontSize: 25.0),
               ),
               Text(
-                "Verifique sua internet!",
+                message,
                 style: TextStyle(fontSize: 25.0),
               ),
             ],

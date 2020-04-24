@@ -35,7 +35,7 @@ class _ClientesState extends State<Clientes> {
       _initBuscaClientes();
     }
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: blue,
         title: Text("Clientes"),
@@ -75,24 +75,6 @@ class _ClientesState extends State<Clientes> {
               ),
             ),
 
-            //Criando a tabela de amostra
-            /*Container(
-              child: Padding(
-                padding: EdgeInsets.all(1.0),
-                child: Table(
-                  columnWidths: {
-                    0: FractionColumnWidth(.2),
-                    1: FractionColumnWidth(.4),
-                    2: FractionColumnWidth(.4)
-                  },
-                  children: [
-                    _criarLinhaTable("Código,Nome,CPF/CNPJ"),
-                  ],
-                ),
-              ),
-            ),
-             */
-
             //mostra os produtos disponíves
             Expanded(
               child: Container(
@@ -102,6 +84,7 @@ class _ClientesState extends State<Clientes> {
                 child: _criaLista(),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom,),
           ],
         ),
       ),

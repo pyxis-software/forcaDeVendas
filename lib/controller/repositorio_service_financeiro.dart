@@ -37,6 +37,6 @@ class RepositoryServiceFinanceiro{
   static Future<void> deleteFromTable () async{
     Database db = await database.database;
     final sql = '''DELETE FROM ${DatabaseCreator.tabelaClientesFinanceiro}''';
-    final data = await db.rawQuery(sql);
+    await db.rawQuery(sql);
   }
 }

@@ -7,6 +7,7 @@ import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/forma_pagamento.dart';
 import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/view/lista_itens_page.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TelaInformacaoVenda extends StatefulWidget {
@@ -15,7 +16,6 @@ class TelaInformacaoVenda extends StatefulWidget {
 
   const TelaInformacaoVenda({Key key, this.idVenda, this.formasPagamento})
       : super(key: key);
-
   @override
   _TelaInformacaoVendaState createState() => _TelaInformacaoVendaState();
 }
@@ -52,6 +52,9 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   double valorDesconto;
   double totalDesconto;
 
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
   @override
   void initState() {
     // TODO: implement initState
@@ -76,263 +79,243 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
         backgroundColor: blue,
         title: Text("Informações do Pedido"),
       ),
+      backgroundColor: blue,
       body: Container(
-        color: blue,
-        child: Stack(
+        child: ListView(
           children: <Widget>[
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: MediaQuery.of(context).size.height * 0.80,
-              child: SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            Container(
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Cliente:",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
+                        height: 60,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.20,
+                        child: Text(
+                          (cliente != null) ? "${cliente.id}" : "",
+                          style: TextStyle(
+                            fontSize: 26,
+                          ),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Cliente:",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Container(
-                                  height: 60,
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.20,
-                                  child: Text(
-                                    (cliente != null) ? "${cliente.id}" : "",
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.70,
-                                  child: Text(
-                                    (cliente != null)
-                                        ? "${cliente.nomeRazao}"
-                                        : "",
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
                       ),
                       Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Valor do Pedido:",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                Container(
-                                  height: 60,
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.20,
-                                  child: Text(
-                                    (totalItens == 0)
-                                        ? "0 Itens"
-                                        : "$totalItens Itens",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.50,
-                                  child: Text(
-                                    (totalItens == 0)
-                                        ? "R\$ 0"
-                                        : "R\$ ${valorItens.toStringAsPrecision(4)}",
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.20,
-                                  child: GestureDetector(
-                                    child: Container(
-                                      height: 60,
-                                      alignment: Alignment.center,
-                                      child: GestureDetector(
-                                        onTap: (){
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      TelaItensPedido(
-                                                        itens: itens,
-                                                      )));
-                                        },
-                                        child: Text(
-                                          "Ver Itens",
-                                          style:
-                                              TextStyle(fontSize: 17, color: blue),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Visibility(
-                              visible: (desconto == 0)? false: true,
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                    height: 30,
-                                    alignment: Alignment.center,
-                                    width: MediaQuery.of(context).size.width * 0.20,
-                                    child: Text("Desconto:",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    width: MediaQuery.of(context).size.width * 0.60,
-                                    child: Text("R\$ ${valorDesconto.toStringAsPrecision(4)}",
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Forma de Pagamento:",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            DropdownButton(
-                              isExpanded: true,
-                              value: FpSelecionada,
-                              items: formasPagamento.map((FormaPagamento fp) {
-                                return new DropdownMenuItem<FormaPagamento>(
-                                  child: Text("${fp.descricao}"),
-                                  value: fp,
-                                );
-                              }).toList(),
-                              onChanged: (fp) {
-                                setState(() {
-                                  FpSelecionada = fp;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Desconto:",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            DropdownButton(
-                              isExpanded: true,
-                              value: tipoDesconto,
-                              items: <DropdownMenuItem<int>>[
-                                DropdownMenuItem(
-                                  value: 0,
-                                  child: Text("SELECIONE"),
-                                ),
-                                DropdownMenuItem(
-                                  value: 1,
-                                  child: Text("Porcentagem"),
-                                ),
-                                DropdownMenuItem(
-                                  value: 2,
-                                  child: Text("Valor"),
-                                ),
-                              ],
-                              onChanged: (tipo) {
-                                setState(() {
-                                  tipoDesconto = tipo;
-                                  if(tipo != 0){
-                                    _confirmarValorDesconto();
-                                  }
-                                });
-                              },
-                            ),
-                          ],
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.70,
+                        child: Text(
+                          (cliente != null) ? "${cliente.nomeRazao}" : "",
+                          style: TextStyle(
+                            fontSize: 26,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
+
+            //Outras informações
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Valor do Pedido:",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Container(
+                        height: 60,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.20,
+                        child: Text(
+                          (totalItens == 0) ? "0 Itens" : "$totalItens Itens",
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.50,
+                        child: Text(
+                          (totalItens == 0)
+                              ? "R\$ 0"
+                              : "${formatoValores.format(valorItens)}",
+                          style: TextStyle(
+                            fontSize: 26,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width * 0.20,
+                        child: GestureDetector(
+                          child: Container(
+                            height: 60,
+                            alignment: Alignment.center,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => TelaItensPedido(
+                                              itens: itens,
+                                            )));
+                              },
+                              child: Text(
+                                "Ver Itens",
+                                style: TextStyle(fontSize: 17, color: blue),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Visibility(
+                    visible: (desconto == 0) ? false : true,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          height: 30,
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width * 0.20,
+                          child: Text(
+                            "Desconto:",
+                            style: TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width * 0.60,
+                          child: Text(
+                            "R\$ ${formatoValores.format(valorDesconto)}",
+                            style: TextStyle(
+                              fontSize: 25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Forma de Pagamento:",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  DropdownButton(
+                    isExpanded: true,
+                    value: FpSelecionada,
+                    items: formasPagamento.map((FormaPagamento fp) {
+                      return new DropdownMenuItem<FormaPagamento>(
+                        child: Text("${fp.descricao}"),
+                        value: fp,
+                      );
+                    }).toList(),
+                    onChanged: (fp) {
+                      setState(() {
+                        FpSelecionada = fp;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Desconto:",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  DropdownButton(
+                    isExpanded: true,
+                    value: tipoDesconto,
+                    items: <DropdownMenuItem<int>>[
+                      DropdownMenuItem(
+                        value: 0,
+                        child: Text("SELECIONE"),
+                      ),
+                      DropdownMenuItem(
+                        value: 1,
+                        child: Text("Porcentagem"),
+                      ),
+                      DropdownMenuItem(
+                        value: 2,
+                        child: Text("Valor"),
+                      ),
+                    ],
+                    onChanged: (tipo) {
+                      setState(() {
+                        tipoDesconto = tipo;
+                        if (tipo != 0) {
+                          _confirmarValorDesconto();
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20,),
+            Container(
               child: Padding(
                 padding: EdgeInsets.all(10),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     _actionSalvaPedido();
                   },
                   child: Container(
@@ -342,7 +325,13 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
                       border: Border.all(color: Colors.white),
                     ),
                     alignment: Alignment.center,
-                    child: Text("Salvar Pedido", style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),),
+                    child: Text(
+                      "Salvar Pedido",
+                      style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -364,6 +353,7 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
         });
       });
     } else {
+      print("Sem cliente");
       Navigator.pop(context);
     }
   }
@@ -384,7 +374,7 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   }
 
   //confirmar o valor do desconto
-  _confirmarValorDesconto(){
+  _confirmarValorDesconto() {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -393,25 +383,33 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
         return AlertDialog(
           content: Container(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text((tipoDesconto == 1)? "Informe a porcentagem de desconto" : "Informe o valor do desconto", style: TextStyle(fontSize: 25.0),),
-                  Divider( height: 20.0, color: Colors.transparent,),
-                  TextFormField(
-                    controller: controllerDesconto,
-                    keyboardType: TextInputType.number,
-                    onChanged: (valor){
-                      setState(() {
-                        desconto = int.parse(valor);
-                      });
-                    },
-                  ),
-                ],
-              )
-          ),
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                (tipoDesconto == 1)
+                    ? "Informe a porcentagem de desconto"
+                    : "Informe o valor do desconto",
+                style: TextStyle(fontSize: 25.0),
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              TextFormField(
+                controller: controllerDesconto,
+                keyboardType: TextInputType.number,
+                onChanged: (valor) {
+                  setState(() {
+                    desconto = int.parse(valor);
+                  });
+                },
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
-              child: new Text("Confirmar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              child: new Text("Confirmar",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               onPressed: () {
                 _calculaDesconto();
                 controllerDesconto.text = "";
@@ -419,7 +417,8 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
               },
             ),
             new FlatButton(
-              child: new Text("Cancelar", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              child: new Text("Cancelar",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               onPressed: () {
                 controllerDesconto.text = "";
                 Navigator.pop(context);
@@ -432,26 +431,24 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   }
 
   //calcula o desconto
-  _calculaDesconto(){
+  _calculaDesconto() {
     //Porcentagem
-    if(tipoDesconto == 1){
-      totalDesconto = (valorItens * desconto ) / 100;
+    if (tipoDesconto == 1) {
+      totalDesconto = (valorItens * desconto) / 100;
       setState(() {
         valorDesconto = valorItens - totalDesconto;
       });
-    }else{
+    } else {
       //valor
       totalDesconto = desconto.toDouble();
       setState(() {
         valorDesconto = valorItens - totalDesconto;
       });
     }
-
   }
 
-
   //Loading
-  _exibeLoading(){
+  _exibeLoading() {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -467,10 +464,12 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    CircularProgressIndicator(
-                    ),
+                    CircularProgressIndicator(),
                     Text("  "),
-                    Text("Salvando...", style: TextStyle(fontSize: 25.0),),
+                    Text(
+                      "Salvando...",
+                      style: TextStyle(fontSize: 25.0),
+                    ),
                   ],
                 ),
               ],
@@ -482,20 +481,23 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
   }
 
   //Ação de salvar o pedido
-  _actionSalvaPedido(){
+  _actionSalvaPedido() {
     _exibeLoading();
     //salvando o tipo de pagamento
-    RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda).then((resultFp){
+    RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda)
+        .then((resultFp) {
       //salvando o cliente do pedido
-      RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m){
-        RepositoryServiceVendas.addCliente(cliente, idVenda, m).then((responseAddCliente){
+      RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m) {
+        RepositoryServiceVendas.addCliente(cliente, idVenda, m)
+            .then((responseAddCliente) {
           //alterando o valor da venda
-          RepositoryServiceVendas.alteraValorVenda(valorItens, valorDesconto, totalDesconto, idVenda).then((result){
+          RepositoryServiceVendas.alteraValorVenda(
+                  valorItens, valorDesconto, totalDesconto, idVenda)
+              .then((result) {
             Navigator.pushNamedAndRemoveUntil(context, "/inicio", (r) => false);
           });
         });
       });
-
     });
   }
 }

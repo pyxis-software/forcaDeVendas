@@ -3,6 +3,7 @@ import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/produto.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TelaSelecionaItem extends StatefulWidget {
@@ -25,6 +26,9 @@ class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
   //quantidade do produto
   int qtd;
 
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
   @override
   void initState() {
     // TODO: implement initState
@@ -45,6 +49,7 @@ class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text("Produtos Disponíveis"),
         backgroundColor: blue,
@@ -83,27 +88,6 @@ class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
                 ),
               ),
             ),
-
-            //Criando a tabela de amostra
-            /*Container(
-              child: Padding(
-                padding: EdgeInsets.all(1.0),
-                child: Table(
-                  columnWidths: {
-                    0: FractionColumnWidth(.2),
-                    1: FractionColumnWidth(.3),
-                    2: FractionColumnWidth(.1),
-                    3: FractionColumnWidth(.2),
-                    4: FractionColumnWidth(.2)
-                  },
-                  children: [
-                    _criarLinhaTable("Código,Descrição,Un,Preço,Estoque"),
-                  ],
-                ),
-              ),
-            ),
-
-             */
 
             //mostra os produtos disponíves
             Expanded(
@@ -152,17 +136,18 @@ class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
                   children: <Widget>[
                     //nome e o código
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.7,
+                      width: MediaQuery.of(context).size.width * 0.65,
                       child: Text("#${produtos[index].idProduto} - ${produtos[index].produtoDescricao}",
                         style: TextStyle(fontSize: 20, color: blue, fontWeight: FontWeight.bold),
                       ),
                     ),
                     //Preço e estoque
                     Container(
+                      alignment: Alignment.center,
                       child: Column(
                         children: <Widget>[
                           Container(
-                            child: Text("R\$ ${produtos[index].pvenda.toStringAsPrecision(4)}", style: TextStyle(fontSize: 19, color: blue, fontWeight: FontWeight.bold),),
+                            child: Text("${formatoValores.format(produtos[index].pvenda)}", style: TextStyle(fontSize: 19, color: blue, fontWeight: FontWeight.bold),),
                           ),
                           Container(
                             child: Text("${produtos[index].produtoUnidade}"),
@@ -218,7 +203,7 @@ class _TelaSelecionaItemState extends State<TelaSelecionaItem> {
                   Divider( height: 20.0, color: Colors.transparent,),
                   Text("Descrição: ${produto.produtoDescricao}"),
                   Divider( height: 5.0, color: Colors.transparent,),
-                  Text("Valor: R\$ ${produto.pvenda}"),
+                  Text("Valor: ${formatoValores.format(produto.pvenda)}"),
                   Divider( height: 5.0, color: Colors.transparent,),
                   Text("Quantidade: $qtd"),
                 ],

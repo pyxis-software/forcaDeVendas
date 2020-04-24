@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/iten.dart';
+import 'package:intl/intl.dart';
 
 class TelaItensPedido extends StatefulWidget {
   final List<Iten> itens;
@@ -14,6 +14,10 @@ class TelaItensPedido extends StatefulWidget {
 class _TelaItensPedidoState extends State<TelaItensPedido> {
 
   List<Iten> itens;
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -117,12 +121,12 @@ class _TelaItensPedidoState extends State<TelaItensPedido> {
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "R\$ ${widget.itens[index].pvenda.toStringAsPrecision(4)}",
+                              "R\$ ${formatoValores.format(itens[index].pvenda)}",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "R\$ ${(widget.itens[index].pvenda * widget.itens[index].qtdVenda).toStringAsPrecision(4)}",
+                              "R\$ ${formatoValores.format((widget.itens[index].pvenda * widget.itens[index].qtdVenda))}",
                               style: TextStyle(
                                   color: Colors.redAccent, fontSize: 20),
                             ),

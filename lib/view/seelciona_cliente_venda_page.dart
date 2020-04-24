@@ -38,7 +38,7 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVenda> {
       _initBuscaClientes();
     }
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: blue,
         title: Text("Incluir Cliente no Pedido"),
@@ -123,7 +123,6 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVenda> {
         return GestureDetector(
           onTap: () {
            _confirmClienteSelecionado(clientes[index]);
-
           },
           child: Column(
             children: <Widget>[
@@ -197,6 +196,7 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVenda> {
   void _selecionaCliente(Cliente cliente) async {
     final pref = await SharedPreferences.getInstance();
     pref.setInt("id_cliente_venda", cliente.id);
+    print("ID da venda: $idVenda");
     RepositoryServicePagamentos.getAllFormasPagamentos().then((lista){
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => TelaInformacaoVenda(idVenda: idVenda, formasPagamento: lista,)));

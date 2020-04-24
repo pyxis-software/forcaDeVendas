@@ -1,9 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:forca_de_vendas/controller/repositorio_service_municipios.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/model/venda.dart';
 import 'package:forca_de_vendas/view/edita_pedido_page.dart';
+import 'package:forca_de_vendas/view/sincronizar_dados_page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +20,9 @@ class _TelaPedidosState extends State<TelaPedidos> {
   final Color blue = Color(0xFF3C5A99);
   final Color amarelo = Color.fromARGB(210, 234, 188, 53);
   final Color blueSelected = Colors.blue;
+
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
   int cont;
   List<Venda> vendas;
   bool selected;
@@ -79,43 +84,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                       ],
                     ),
                     onPressed: () {
-                      int id = randomizer.nextInt(10000);
-                      DateTime now = DateTime.now();
-                      String formattedDate =
-                          DateFormat('dd/MM/yyyy').format(now);
-                      print(id);
-                      //criando uma nova venda
-                      Map<String, dynamic> v() => {
-                            "id": id,
-                            "data_venda": formattedDate,
-                            "id_empresa": usuario.empresaId,
-                            "id_cliente": 0,
-                            "nome_razao": "",
-                            "clienteCidade": "",
-                            "id_vendedor": usuario.colaboradorId,
-                            "id_fpagto": 0,
-                            "id_usuario": usuario.usuarioId,
-                            "tot_bruto": 0.0,
-                            "pedido_status": 0,
-                            "tot_desc_prc": 0,
-                            "tot_desc_vlr": 0.0,
-                            "tot_liquido": 0.0,
-                            "pedido_nfiscal": "",
-                            "pedido_nfiscal_emissao": ""
-                          };
-                      //criando a venda
-                      Venda venda = Venda.fromMap(v());
-                      RepositoryServiceVendas.addVenda(venda).then((idRetorno) {
-                        if (idRetorno != null) {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TelaAdicionaVenda(
-                                  vendaId: id,
-                                ),
-                              ));
-                        }
-                      });
+                      _actionNovoPedido();
                     },
                   ),
                 ),
@@ -280,7 +249,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "R\$ ${vendas[index].totLiquido.toStringAsPrecision(4)}",
+                            "${formatoValores.format(vendas[index].totLiquido)}",
                             style: TextStyle(
                                 color: Colors.redAccent, fontSize: 17),
                           ),
@@ -299,13 +268,18 @@ class _TelaPedidosState extends State<TelaPedidos> {
                         child: Icon(
                           Icons.edit,
                           size: 50,
-                          color: amarelo,
+                          color: blue,
                         ),
                         onPressed: () {
                           //editando o pedido
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => TelaEdita(venda: vendas[index],)));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TelaEdita(
+                                venda: vendas[index],
+                              ),
+                            ),
+                          );
                         },
                       ),
                       SizedBox(
@@ -318,7 +292,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                         child: Icon(
                           Icons.delete,
                           size: 50,
-                          color: amarelo,
+                          color: blue,
                         ),
                       ),
                     ],
@@ -394,7 +368,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                                 fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "R\$ ${vendas[index].totLiquido.toStringAsPrecision(4)}",
+                            "${formatoValores.format(vendas[index].totLiquido)}",
                             style: TextStyle(
                                 color: Colors.redAccent, fontSize: 17),
                           ),
@@ -471,5 +445,101 @@ class _TelaPedidosState extends State<TelaPedidos> {
         Navigator.pop(context);
       });
     });
+  }
+
+  _actionNovoPedido() async {
+    RepositoryServiceMunicipios.getAllMunicipos().then((lista) {
+      print(lista.length);
+      if (lista.length == 0) {
+        _exibePermissaoSinc();
+      } else {
+        int id = randomizer.nextInt(10000);
+        DateTime now = DateTime.now();
+        String formattedDate = DateFormat('dd/MM/yyyy').format(now);
+        print(id);
+        //criando uma nova venda
+        Map<String, dynamic> v() => {
+              "id": id,
+              "data_venda": formattedDate,
+              "id_empresa": usuario.empresaId,
+              "id_cliente": 0,
+              "nome_razao": "",
+              "clienteCidade": "",
+              "id_vendedor": usuario.colaboradorId,
+              "id_fpagto": 0,
+              "id_usuario": usuario.usuarioId,
+              "tot_bruto": 0.0,
+              "pedido_status": 0,
+              "tot_desc_prc": 0,
+              "tot_desc_vlr": 0.0,
+              "tot_liquido": 0.0,
+              "pedido_nfiscal": "",
+              "pedido_nfiscal_emissao": ""
+            };
+        //criando a venda
+        Venda venda = Venda.fromMap(v());
+        RepositoryServiceVendas.addVenda(venda).then((idRetorno) {
+          if (idRetorno != null) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TelaAdicionaVenda(
+                    vendaId: id,
+                  ),
+                ));
+          }
+        });
+      }
+    });
+  }
+
+  void _exibePermissaoSinc() {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: Container(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Image.asset(
+                'lib/assets/alerta.png',
+                width: 50,
+                height: 50,
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Você precisa sincronizar os dados antes de cadastrar um novo cliente!",
+                style: TextStyle(fontSize: 25.0),
+              ),
+            ],
+          )),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Sincronizar"),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SincronizarDados(),
+                    ));
+              },
+            ),
+            new FlatButton(
+              child: new Text("Cancelar"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

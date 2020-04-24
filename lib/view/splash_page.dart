@@ -18,6 +18,7 @@ class _TelaSplashState extends State<TelaSplash> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    //definindo um delay de 4 segundos para ir para a proxima tela
     SystemChrome.setEnabledSystemUIOverlays([]);
     Future.delayed(Duration(seconds: 4)).then((_) {
       verificaLogin();

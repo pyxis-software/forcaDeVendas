@@ -31,13 +31,14 @@ class _TelaLoginState extends State<TelaLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: true,
       backgroundColor: blue,
       body: Stack(
         alignment: Alignment.topCenter,
         children: <Widget>[
           Container(
             padding: EdgeInsets.all(20),
-            child: Column(
+            child: ListView(
               children: <Widget>[
                 SizedBox(
                   height: 100,
@@ -86,15 +87,7 @@ class _TelaLoginState extends State<TelaLogin> {
                     labelText: "Senha",
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          //Botões em baixo
-          Positioned(
-            top: MediaQuery.of(context).size.height - 150,
-            child: Column(
-              children: <Widget>[
+                SizedBox(height: 50,),
                 ButtonTheme(
                   minWidth: MediaQuery.of(context).size.width,
                   height: 50,
@@ -132,6 +125,16 @@ class _TelaLoginState extends State<TelaLogin> {
               ],
             ),
           ),
+
+          //Botões em baixo
+          Positioned(
+            top: MediaQuery.of(context).size.height - 150,
+            child: Column(
+              children: <Widget>[
+
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -159,7 +162,7 @@ class _TelaLoginState extends State<TelaLogin> {
       print(senhaConvert);
       if (user == usuario.usuarioNome && senhaConvert == usuario.usuarioSenha) {
         //verifica se o  usuário quer salvar seu login
-        if (salvaAuth) {
+        if (true) {
           //entra salvando o login
           final pref = await SharedPreferences.getInstance();
           pref.setBool('auth', true);

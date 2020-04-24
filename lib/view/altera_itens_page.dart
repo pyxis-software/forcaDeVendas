@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/iten.dart';
-import 'package:forca_de_vendas/view/seelciona_cliente_venda_page.dart';
 import 'package:forca_de_vendas/view/seleciona_item_pedido_page.dart';
+import 'package:intl/intl.dart';
 
 class AlteraItensPedido extends StatefulWidget {
   final int vendaId;
@@ -28,6 +28,9 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
   int contItens;
   double soma;
 
+  //formato de valores
+  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+
   @override
   void initState() {
     // TODO: implement initState
@@ -48,7 +51,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomPadding: true,
       appBar: AppBar(
         title: Text("Editar Itens do Pedido"),
         backgroundColor: blue,
@@ -61,7 +64,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
               top: 0,
               left: 0,
               right: 0,
-              height: MediaQuery.of(context).size.height * 0.85,
+              height: MediaQuery.of(context).size.height * 0.79,
               child: Container(
                 color: blue,
                 child: Column(
@@ -71,7 +74,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
                     ),
                     Text(
                       (contItens != 0)
-                          ? "Total: R\$ ${soma.toStringAsPrecision(4)}"
+                          ? "Total: ${formatoValores.format(soma)}"
                           : "Adicione os Itens primeiro!",
                       style: TextStyle(fontSize: 25, color: Colors.white),
                     ),
@@ -84,10 +87,10 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
               ),
             ),
             Positioned(
-              bottom: 0,
+              bottom: MediaQuery.of(context).padding.bottom,
               left: 0,
               right: 0,
-              height: MediaQuery.of(context).size.height * 0.15,
+              height: MediaQuery.of(context).size.height * 0.12,
               child: Container(
                 padding: EdgeInsets.all(10),
                 color: blue,
@@ -115,7 +118,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         width: MediaQuery.of(context).size.width,
-                        height: 70,
+                        height: 60,
                         child: Center(
                           child: Text(
                             "Adicionar Item",
@@ -164,7 +167,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
     if (contItens == 0) {
       return Container(
         alignment: Alignment.center,
-        height: MediaQuery.of(context).size.height * 0.70,
+        height: MediaQuery.of(context).size.height * 0.60,
         child: Center(
           child: Text(
             "Sem Itens",
@@ -174,7 +177,7 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
       );
     } else {
       return Container(
-        height: MediaQuery.of(context).size.height * 0.70,
+        height: MediaQuery.of(context).size.height * 0.60,
         child: ListView.builder(
           physics: BouncingScrollPhysics(),
           itemCount: contItens,
@@ -255,12 +258,12 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "R\$ ${itens[index].pvenda.toStringAsPrecision(4)}",
+                                "${formatoValores.format(itens[index].pvenda)}",
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "R\$ ${(itens[index].pvenda * itens[index].qtdVenda).toStringAsPrecision(4)}",
+                                "${formatoValores.format((itens[index].pvenda * itens[index].qtdVenda))}",
                                 style: TextStyle(
                                     color: Colors.redAccent, fontSize: 20),
                               ),

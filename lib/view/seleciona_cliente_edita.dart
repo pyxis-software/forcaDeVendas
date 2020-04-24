@@ -39,7 +39,7 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVendaEdi
       _initBuscaClientes();
     }
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: blue,
         title: Text("Incluir Cliente no Pedido"),
@@ -88,6 +88,7 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVendaEdi
                 child: _criaLista(),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).padding.bottom,),
           ],
         ),
       ),
