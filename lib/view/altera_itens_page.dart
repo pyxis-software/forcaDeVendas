@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:forca_de_vendas/controller/repositeorio_servide_produtos.dart';
 import 'package:forca_de_vendas/controller/repositorio_service_vendas.dart';
 import 'package:forca_de_vendas/model/iten.dart';
+import 'package:forca_de_vendas/model/venda.dart';
 import 'package:forca_de_vendas/view/seleciona_item_pedido_page.dart';
 import 'package:intl/intl.dart';
 
@@ -27,9 +28,11 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
   int vendaId;
   int contItens;
   double soma;
+  Venda venda;
 
   //formato de valores
-  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+  final formatoValores =
+      new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   @override
   void initState() {
@@ -58,38 +61,18 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
       ),
       backgroundColor: blue,
       body: Container(
-        child: Stack(
+        child: Column(
           children: <Widget>[
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: MediaQuery.of(context).size.height * 0.79,
-              child: Container(
-                color: blue,
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Text(
-                      (contItens != 0)
-                          ? "Total: ${formatoValores.format(soma)}"
-                          : "Adicione os Itens primeiro!",
-                      style: TextStyle(fontSize: 25, color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    _criaListaItens(),
-                  ],
-                ),
-              ),
+            SizedBox(
+              height: 30,
             ),
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom,
-              left: 0,
-              right: 0,
+            Text(
+              (contItens != 0)
+                  ? "Total: ${formatoValores.format(soma)}"
+                  : "Adicione os Itens primeiro!",
+              style: TextStyle(fontSize: 25, color: Colors.white),
+            ),
+            Container(
               height: MediaQuery.of(context).size.height * 0.12,
               child: Container(
                 padding: EdgeInsets.all(10),
@@ -107,9 +90,9 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => TelaSelecionaItem(
-                                    produtos: lista,
-                                    idVenda: vendaId,
-                                  )));
+                                        produtos: lista,
+                                        idVenda: vendaId,
+                                      )));
                         });
                       },
                       child: Container(
@@ -122,14 +105,18 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
                         child: Center(
                           child: Text(
                             "Adicionar Item",
-                            style:
-                            TextStyle(fontSize: 25, color: Colors.white),
+                            style: TextStyle(fontSize: 25, color: Colors.white),
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                child: _criaListaItens(),
               ),
             ),
           ],
@@ -143,23 +130,40 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
     print("Buscando os itens");
     RepositoryServiceVendas.getItensVenda(vendaId).then((lista) {
       //salvando o valor total
-      double s = 0.0;
+      double s = 0;
       for (Iten i in lista) {
         final totalProduto = (i.pvenda * i.qtdVenda);
         s += totalProduto;
       }
+
       //alterando o valor no banco de dados
-      RepositoryServiceVendas.getVenda(vendaId).then((v){
-        RepositoryServiceVendas.alteraValorVenda(soma, (v.totBruto - v.totDescVlr), v.totDescVlr, vendaId).then((returno){
+      RepositoryServiceVendas.getVenda(vendaId).then((v) {
+        //calculando o desconto da venda
+        //Porcentagem
+        print("Desconto: ${v.desconto} - Tipo: ${v.tipoDesconto} - Valor: $s");
+        if (v.tipoDesconto == 1) {
           setState(() {
-            contItens = lista.length;
-            itens = lista;
+            soma = s -((s * v.desconto) / 100);
+          });
+        } else if (v.tipoDesconto == 2) {
+          //valor
+          setState(() {
+            soma = s - v.desconto;
+          });
+        } else {
+          setState(() {
             soma = s;
           });
+        }
+        print(soma);
+        setState(() {
+          contItens = lista.length;
+          itens = lista;
         });
+
+        RepositoryServiceVendas.alteraValorVenda(
+            s, soma, v.totDescVlr, v.tipoDesconto, v.desconto, vendaId);
       });
-
-
     });
   }
 
@@ -317,23 +321,23 @@ class _AlteraItensPedidoState extends State<AlteraItensPedido> {
         return AlertDialog(
           content: Container(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Atenção!",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  Divider(
-                    height: 20.0,
-                    color: Colors.transparent,
-                  ),
-                  Text(
-                    "Excluir ítem do pedido?",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              )),
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "Atenção!",
+                style: TextStyle(fontSize: 20),
+              ),
+              Divider(
+                height: 20.0,
+                color: Colors.transparent,
+              ),
+              Text(
+                "Excluir ítem do pedido?",
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          )),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Confirmar"),

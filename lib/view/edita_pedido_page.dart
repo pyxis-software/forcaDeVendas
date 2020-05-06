@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:forca_de_vendas/controller/repositorio_service_pagamentos.dart';
 import 'package:forca_de_vendas/model/venda.dart';
-import 'package:forca_de_vendas/view/seelciona_cliente_venda_page.dart';
 import 'package:forca_de_vendas/view/seleciona_cliente_edita.dart';
-
-import 'altera_informacoes_page.dart';
 import 'altera_itens_page.dart';
 
 class TelaEdita extends StatefulWidget {

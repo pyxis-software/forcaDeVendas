@@ -1,5 +1,4 @@
 import 'package:forca_de_vendas/controller/creator_database.dart';
-import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/produto.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';

@@ -21,7 +21,8 @@ class _TelaPedidosState extends State<TelaPedidos> {
   final Color amarelo = Color.fromARGB(210, 234, 188, 53);
   final Color blueSelected = Colors.blue;
 
-  final formatoValores = new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
+  final formatoValores =
+      new NumberFormat.currency(locale: "pt_BR", symbol: "R\$");
 
   int cont;
   List<Venda> vendas;
@@ -126,7 +127,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          "Faturado",
+                          "Enviado",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -221,7 +222,8 @@ class _TelaPedidosState extends State<TelaPedidos> {
                           Text(
                             "${(vendas[index].clienteCidade == "") ? "Sem Cidade" : vendas[index].clienteCidade}",
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.clip,
                           ),
                         ],
                       ),
@@ -329,7 +331,7 @@ class _TelaPedidosState extends State<TelaPedidos> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -340,7 +342,8 @@ class _TelaPedidosState extends State<TelaPedidos> {
                           Text(
                             "${(vendas[index].clienteCidade == "") ? "Sem Cidade" : vendas[index].clienteCidade}",
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.fade,
                           ),
                         ],
                       ),
@@ -476,7 +479,9 @@ class _TelaPedidosState extends State<TelaPedidos> {
               "pedido_nfiscal": "",
               "pedido_nfiscal_emissao": "",
               "lat": "",
-              "lng": ""
+              "lng": "",
+              "tipoDesconto": 0,
+              "desconto": 0
             };
         //criando a venda
         Venda venda = Venda.fromMap(v());

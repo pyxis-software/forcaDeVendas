@@ -119,7 +119,7 @@ String textToMd5 (String text) {
 //SALVANDO OS DADOS DO SINCRONISMO
 
 //produtos
-bool salvaProdutos(http.Response resposta, double percent){
+bool salvaProdutos(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     final listProdutos = json.decode(resposta.body).cast<Map<String, dynamic>>();
@@ -134,8 +134,6 @@ bool salvaProdutos(http.Response resposta, double percent){
         //print(data);
       });
     }
-    percent = percent + 0.1;
-    print(percent);
     return true;
   }else{
     //erro
@@ -144,7 +142,7 @@ bool salvaProdutos(http.Response resposta, double percent){
 }
 
 //municípios
-salvaMunicipios(http.Response resposta, double percent){
+salvaMunicipios(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -162,8 +160,6 @@ salvaMunicipios(http.Response resposta, double percent){
         });
 
       }
-      percent += 0.1;
-      print(percent);
       return true;
     }
   }else{
@@ -173,7 +169,7 @@ salvaMunicipios(http.Response resposta, double percent){
 }
 
 //Salva formas de pagamento
-bool salvaFormasPagamento(http.Response resposta, double percent){
+bool salvaFormasPagamento(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -189,8 +185,6 @@ bool salvaFormasPagamento(http.Response resposta, double percent){
           //print("$id");
         });
       }
-      percent += 0.1;
-      print(percent);
       return true;
     }
   }else{
@@ -200,7 +194,7 @@ bool salvaFormasPagamento(http.Response resposta, double percent){
 }
 
 //Salva os tipos de clientes
-bool salvaTipoClientes(http.Response resposta, double percent){
+bool salvaTipoClientes(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -216,8 +210,6 @@ bool salvaTipoClientes(http.Response resposta, double percent){
           //print("$id");
         });
       }
-      percent += 0.1;
-      print(percent);
       return true;
     }
   }else{
@@ -227,7 +219,7 @@ bool salvaTipoClientes(http.Response resposta, double percent){
 }
 
 //salva os status dos clientes
-bool salvaStatusCliente(http.Response resposta, double percent){
+bool salvaStatusCliente(http.Response resposta){
   //verifica se a resposta está correta
   if(resposta.statusCode == 200){
     //verifica se não houve algum erro de dados
@@ -243,8 +235,6 @@ bool salvaStatusCliente(http.Response resposta, double percent){
           //print("$id");
         });
       }
-      percent += 0.1;
-      print(percent);
       return true;
     }
   }else{

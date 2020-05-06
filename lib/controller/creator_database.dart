@@ -26,6 +26,8 @@ class DatabaseCreator {
   static const vendaNFiscalEmissao = "pedido_nfiscal_emissao";
   static const vendaLat = "lat";
   static const vendaLng = "lng";
+  static const vendaTipoDesconto = "tipoDesconto";
+  static const vendaDesconto = "desconto";
 
   //Tabela Clientes
   static const tabelaClientes = "clientes";
@@ -126,6 +128,17 @@ class DatabaseCreator {
   static const tabelaItensGrade = "grade";
   static const tabelaItensIdVendedor = "id_vendedor";
 
+
+  //Tabela de agendamentos
+  static const tabelaAgendamento = "agendamentos";
+  static const tabelaAgendamentoId = "id";
+  static const tabelaAgendamentoIdCliente = "id_pessoa";
+  static const tabelaAgendamentoNomeCliente = "nome_cliente";
+  static const tabelaAgendamentoIdVendador = "id_vendedor";
+  static const tabelaAgendamentoData = "data";
+  static const tabelaAgendamentoObservacao = "observacao";
+  static const tabelaAgendamentoVisitou = "visitou";
+
   Future<void> createTodoTable(Database db) async{
     final todoSql = '''CREATE TABLE $tabelaVenda
     (
@@ -147,6 +160,8 @@ class DatabaseCreator {
       $vendaNFiscalEmissao TEXT,
       $vendaLat TEXT,
       $vendaLng TEXT,
+      $vendaTipoDesconto INTEGER,
+      $vendaDesconto INTEGER,
       UNIQUE($vendasId)
     )''';
 
@@ -286,6 +301,21 @@ class DatabaseCreator {
     ''';
 
 
+    //Criando a tabela de agendamentos
+    final agendamento = '''CREATE TABLE $tabelaAgendamento
+    (
+      $tabelaAgendamentoId INTEGER PRIMARY KEY,
+      $tabelaAgendamentoIdCliente INTEGER,
+      $tabelaAgendamentoNomeCliente TEXT,
+      $tabelaAgendamentoIdVendador INTEGER,
+      $tabelaAgendamentoData TEXT,
+      $tabelaAgendamentoObservacao TEXT,
+      $tabelaAgendamentoVisitou INTEGER,
+      UNIQUE($tabelaAgendamentoId)
+    )
+    ''';
+
+
     await db.execute(todoSql);
     await db.execute(createtableItens);
     await db.execute(clienteSql);
@@ -295,6 +325,7 @@ class DatabaseCreator {
     await db.execute(tipoClienteSql);
     await db.execute(clienteStatusSql);
     await db.execute(clientesFinanceiro);
+    await db.execute(agendamento);
   }
 
   Future<String> getDatabasePath (String dbName)async{

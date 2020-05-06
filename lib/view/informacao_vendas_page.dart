@@ -10,7 +10,6 @@ import 'package:forca_de_vendas/view/lista_itens_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toast/toast.dart';
 
 class TelaInformacaoVenda extends StatefulWidget {
   final int idVenda;
@@ -375,7 +374,8 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
     RepositoryServiceVendas.getItensVenda(idVenda).then((lista) {
       double soma = 0;
       for (Iten iten in lista) {
-        soma += iten.pvenda;
+        soma += (iten.pvenda * iten.qtdVenda);
+        print("${iten.pvenda} * ${iten.qtdVenda}");
       }
       setState(() {
         totalItens = lista.length;
@@ -450,11 +450,15 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
       setState(() {
         valorDesconto = valorItens - totalDesconto;
       });
-    } else {
+    } else if(tipoDesconto == 2) {
       //valor
       totalDesconto = desconto.toDouble();
       setState(() {
         valorDesconto = valorItens - totalDesconto;
+      });
+    } else {
+      setState(() {
+        valorDesconto = valorItens;
       });
     }
   }
@@ -552,36 +556,32 @@ class _TelaInformacaoVendaState extends State<TelaInformacaoVenda> {
 
   //Ação de salvar o pedido
   _actionSalvaPedido() {
-    if (desconto == 0) {
-      print("Selecione o desconto");
-      Navigator.pop(context);
-      Toast.show("Selecione o desconto", context, duration: 3, gravity: Toast.BOTTOM);
-    } else {
-      setState(() {
-        mensagemAlerta = "Salvando...";
-      });
-      //salvando o tipo de pagamento
-      RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda)
-          .then((resultFp) {
-        //salvando o cliente do pedido
-        RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m) {
-          RepositoryServiceVendas.addCliente(cliente, idVenda, m)
-              .then((responseAddCliente) {
-            //alterando o valor da venda
-            RepositoryServiceVendas.alteraValorVenda(
-                    valorItens, valorDesconto, totalDesconto, idVenda)
-                .then((result) {
-              RepositoryServiceVendas.alteraLocalizacao(
-                      positionUser.latitude, positionUser.longitude, idVenda)
-                  .then((res) {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, "/inicio", (r) => false);
-              });
+    setState(() {
+      mensagemAlerta = "Salvando...";
+    });
+    _calculaDesconto();
+
+    //salvando o tipo de pagamento
+    RepositoryServiceVendas.alteraFormaPagamento(FpSelecionada.id, idVenda)
+        .then((resultFp) {
+      //salvando o cliente do pedido
+      RepositoryServiceMunicipios.getMunicipio(cliente.idMunicipio).then((m) {
+        RepositoryServiceVendas.addCliente(cliente, idVenda, m)
+            .then((responseAddCliente) {
+          //alterando o valor da venda
+          RepositoryServiceVendas.alteraValorVenda(
+                  valorItens, valorDesconto, totalDesconto, tipoDesconto, desconto, idVenda)
+              .then((result) {
+            RepositoryServiceVendas.alteraLocalizacao(
+                    positionUser.latitude, positionUser.longitude, idVenda)
+                .then((res) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/inicio", (r) => false);
             });
           });
         });
       });
-    }
+    });
   }
 
   _getLocationUser() async {

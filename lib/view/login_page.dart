@@ -161,8 +161,12 @@ class _TelaLoginState extends State<TelaLogin> {
       String senhaConvert = textToMd5(pass);
       print(senhaConvert);
       if (user == usuario.usuarioNome && senhaConvert == usuario.usuarioSenha) {
+        //Entra sem salvar o login
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => TelaHome()));
+        /*
         //verifica se o  usuário quer salvar seu login
-        if (true) {
+        if (false) {
           //entra salvando o login
           final pref = await SharedPreferences.getInstance();
           pref.setBool('auth', true);
@@ -173,6 +177,7 @@ class _TelaLoginState extends State<TelaLogin> {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => TelaHome()));
         }
+        */
       } else {
         _errorDadosInput("Nome de usuário ou senha incorreta");
       }

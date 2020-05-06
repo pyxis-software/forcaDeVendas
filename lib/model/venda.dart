@@ -24,6 +24,8 @@ class Venda {
     final String pedidoNfiscalEmissao;
     final String lat;
     final String lng;
+    final int tipoDesconto;
+    final int desconto;
 
     Venda({
         @required this.id,
@@ -44,6 +46,8 @@ class Venda {
         @required this.pedidoNfiscalEmissao,
         @required this.lat,
         @required this.lng,
+        @required this.tipoDesconto,
+        @required this.desconto,
     });
 
     Venda copyWith({
@@ -63,8 +67,10 @@ class Venda {
         int totLiquido,
         String pedidoNfiscal,
         String pedidoNfiscalEmissao,
-        int latitude,
-        int longitude,
+        String lat,
+        String lng,
+        int tipoDesconto,
+        int desconto,
     }) => 
         Venda(
             id: id ?? this.id,
@@ -85,6 +91,8 @@ class Venda {
             pedidoNfiscalEmissao: pedidoNfiscalEmissao ?? this.pedidoNfiscalEmissao,
             lat: lat ?? this.lat,
             lng: lng ?? this.lng,
+            tipoDesconto: tipoDesconto ?? this.tipoDesconto,
+            desconto: desconto ?? this.desconto,
         );
 
     factory Venda.fromRawJson(String str) => Venda.fromJson(json.decode(str));
@@ -110,6 +118,8 @@ class Venda {
         pedidoNfiscalEmissao: json["pedido_nfiscal_emissao"] == null ? null : json["pedido_nfiscal_emissao"],
         lat: json["lat"] == null ? null : json["lat"],
         lng: json["lng"] == null ? null : json["lng"],
+        tipoDesconto: json["tipoDesconto"] == null ? null : json["tipoDesconto"],
+        desconto: json["desconto"] == null ? null : json["desconto"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -131,6 +141,8 @@ class Venda {
         "pedido_nfiscal_emissao": pedidoNfiscalEmissao == null ? null : pedidoNfiscalEmissao,
         "lat": lat == null ? null : lat,
         "lng": lng == null ? null : lng,
+        "tipoDesconto": tipoDesconto == null ? null : tipoDesconto,
+        "desconto": desconto == null ? null : desconto,
     };
 
     factory Venda.fromMap(Map<String, dynamic> json) => Venda(
@@ -151,7 +163,9 @@ class Venda {
         pedidoNfiscal: json["pedido_nfiscal"] == null ? null : json["pedido_nfiscal"],
         pedidoNfiscalEmissao: json["pedido_nfiscal_emissao"] == null ? null : json["pedido_nfiscal_emissao"],
         lat: json["lat"] == null ? null : json["lat"],
-        lng: json["longitude"] == null ? null : json["lng"],
+        lng: json["lng"] == null ? null : json["lng"],
+        tipoDesconto: json["tipoDesconto"] == null ? null : json["tipoDesconto"],
+        desconto: json["desconto"] == null ? null : json["desconto"],
     );
 
     Map<String, dynamic> toMap() => {
@@ -173,5 +187,7 @@ class Venda {
         "pedido_nfiscal_emissao": pedidoNfiscalEmissao == null ? null : pedidoNfiscalEmissao,
         "lat": lat == null ? null : lat,
         "lng": lng == null ? null : lng,
+        "tipoDesconto": tipoDesconto == null ? null : tipoDesconto,
+        "desconto": desconto == null ? null : desconto,
     };
 }

@@ -4,6 +4,7 @@ import 'package:forca_de_vendas/model/cliente.dart';
 import 'package:forca_de_vendas/model/iten.dart';
 import 'package:forca_de_vendas/model/municipio.dart';
 import 'package:forca_de_vendas/model/produto.dart';
+import 'package:forca_de_vendas/model/result_pedido.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/model/venda.dart';
 import 'package:sqflite/sqflite.dart';
@@ -67,9 +68,10 @@ class RepositoryServiceVendas{
   }
 
   //altera valor da venda
-  static Future<void> alteraValorVenda (total_bruto, total_liquido, total_desconto, id) async{
+  static Future<void> alteraValorVenda (total_bruto, total_liquido, total_desconto, tipo_desconto, desconto, id) async{
     Database db = await database.database;
-    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET tot_bruto = $total_bruto, tot_desc_vlr = $total_desconto, tot_liquido = $total_liquido WHERE ${DatabaseCreator.vendasId} == $id''';
+    print(tipo_desconto);
+    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET ${DatabaseCreator.vendaTipoDesconto} = $tipo_desconto, ${DatabaseCreator.vendaDesconto} = $desconto, tot_bruto = $total_bruto, tot_desc_vlr = $total_desconto, tot_liquido = $total_liquido WHERE ${DatabaseCreator.vendasId} == $id''';
     db.rawUpdate(sql);
   }
 
@@ -161,9 +163,9 @@ class RepositoryServiceVendas{
 
 
   //Altera o status da venda
-  static Future<void> alteraStatus (Venda venda) async{
+  static Future<void> alteraStatus (Venda venda,ResultPedido res) async{
     Database db = await database.database;
-    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET pedido_status = 2 WHERE ${DatabaseCreator.vendasId} == ${venda.id}''';
+    final sql = '''UPDATE ${DatabaseCreator.tabelaVenda} SET pedido_status = 2, id = ${res.result}  WHERE ${DatabaseCreator.vendasId} == ${venda.id}''';
     db.rawUpdate(sql);
   }
 

@@ -198,6 +198,7 @@ class _TelaSelecionaClienteVendaState extends State<TelaSelecionaClienteVenda> {
     pref.setInt("id_cliente_venda", cliente.id);
     print("ID da venda: $idVenda");
     RepositoryServicePagamentos.getAllFormasPagamentos().then((lista){
+      Navigator.pop(context);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => TelaInformacaoVenda(idVenda: idVenda, formasPagamento: lista,)));
     });

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forca_de_vendas/model/usuario.dart';
 import 'package:forca_de_vendas/view/cadastro_cliente_page.dart';
 import 'package:forca_de_vendas/view/clientes_page.dart';
+import 'package:forca_de_vendas/view/lista_agendamento_page.dart';
 import 'package:forca_de_vendas/view/pedidos_page.dart';
 import 'package:forca_de_vendas/view/produtos_page.dart';
 import 'package:forca_de_vendas/view/sincronizar_dados_page.dart';
-import 'package:forca_de_vendas/view/teste.dart';
 import 'package:forca_de_vendas/widgets/button_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -304,7 +305,7 @@ class _TelaHomeState extends State<TelaHome> {
                                             ),
                                             Text("  "),
                                             Text(
-                                              "Relatórios",
+                                              "Agendamentos",
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 20,
@@ -319,7 +320,14 @@ class _TelaHomeState extends State<TelaHome> {
                                         ),
                                       ],
                                     ),
-                                    onPressed: () {}),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ListaAgendamento()),
+                                      );
+                                    }),
                               ),
                             ),
                             Divider(
@@ -437,7 +445,7 @@ class _TelaHomeState extends State<TelaHome> {
   _logOut() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool('auth', false);
-    Navigator.pushNamedAndRemoveUntil(context, "/login", (r) => false);
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
   }
 
   //Confirmação de Log out
